@@ -1,6 +1,5 @@
 use serde::Deserialize;
-use std::fs;
-use reqwest::Client;
+use reqwest::{Client, Response};
 
 pub struct Const;
 
@@ -11,17 +10,6 @@ impl Const {
     pub fn api_t() -> &'static str {
         "https://t.bressani.dev:1178"
     }
-    pub fn token(optional_password: Option<String>) -> String {
-        if let Some(pass) = optional_password {
-            return pass;
-        }
-        // lecture depuis Secrets.plist ou .env
-        let secrets_path = "Secrets.plist";
-        let content = fs::read_to_string(secrets_path).unwrap_or_default();
-        // ⚠ Ici il faudrait parser le plist (ou autre format)
-        // Pour le moment on renvoie brut
-        content.trim().to_string()
-    }
 }
 
 #[derive(Deserialize)]
@@ -30,44 +18,40 @@ struct TokenResponse {
 }
 
 pub struct MultiAuth {
-    pub password: Option<String>,
     pub token_n: Option<String>,
     pub token_t: Option<String>,
 }
 
 impl MultiAuth {
-    pub async fn new(password: Option<String>) -> Self {
-        let pass = Some(Const::token(password.as_ref().cloned()));
-        let token_n = Self::fetch_token(Const::api(), pass.as_ref().cloned());
-        //let token_t = Self::fetch_token(&format!("{}/public", Const::api_t()), pass.clone());
-        /*if let Some(ref t) = token_n {
-            println!("✅ Token ok pour: {} {}", Const::api(), t);
-        }
-        if let Some(ref t) = token_t {
-            println!("✅ Token ok pour: {} {}", Const::api_t(), t);
-        }
-*/
+    pub async fn new(password: String) -> Self {
+        let url_n = Const::api().to_string();
+        let token_n = Self::fetch_token(&url_n, password.as_str().to_string());
+        let url_t = format!("{}/public", Const::api_t());
+        let token_t = Self::fetch_token(&url_t, password.as_str().to_string());
         MultiAuth {
-            password: pass,
             token_n: token_n.await,
-            token_t: None,
+            token_t: token_t.await,
         }
     }
 
-    async fn fetch_token(base_url: &str, password: Option<String>) -> Option<String> {
+    async fn fetch_token(base_url: &String, password: String) -> Option<String> {
         let client = Client::new();
-        let url = format!("{}/token_ipad?password={}", base_url, Const::token(password));
+        let url = format!("{}/token_ipad?password={}", base_url, password);
 
-        let resp = client
+        let resp: Option<Response> = client
             .post(&url)
             .header("Accept", "application/json")
             .send()
             .await
-            .ok()?;
+            .ok();
 
-        // let token_resp: TokenResponse = resp.json().ok()?;
-        println!("-> {:?}", resp);
-        Some("token_resp.token".to_string())
+        //println!("-> {:?}", resp); // Le status est ici
+        let body = resp?.text().await.ok()?;
+        //println!("body: {:?}", body);
+        let token_resp: TokenResponse = serde_json::from_str(&body).ok()?;
+        //println!("token: {}", token_resp.token);
+
+        Some(token_resp.token)
     }
 
     pub fn get_token(&self) -> (Option<String>, Option<String>) {

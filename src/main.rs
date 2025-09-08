@@ -1,5 +1,6 @@
 mod core_docx;
 mod api;
+mod password;
 
 // mod tools;
 use std::fs::File;
@@ -9,8 +10,8 @@ use crate::api::MultiAuth;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-
-    let auth = MultiAuth::new(None).await;
+    let password = password::load_password("Secrets.yaml");
+    let auth = MultiAuth::new(password.unwrap()).await;
     let (token_n, token_t) = auth.get_token();
 
     println!("Token N: {:?}", token_n);
