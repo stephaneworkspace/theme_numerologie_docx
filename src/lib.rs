@@ -10,6 +10,7 @@ use std::io::{Cursor, Read};
 use base64::engine::general_purpose;
 use base64::Engine as _;
 use docx_rs::{Docx, Paragraph, Pic, Run};
+use serde_json::Value;
 
 #[no_mangle]
 pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char, nom: *const libc::c_char, date: *const libc::c_char) -> *const libc::c_char {
@@ -36,7 +37,11 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
         Ok(s) => s,
         Err(_) => return std::ptr::null_mut(),
     };
-    let mut json_payload;
+    let mut json_payload: Value = serde_json::json!({
+        "token_n": "",
+        "token_t": "",
+        "docx_base64": ""
+    });
     // bloquer l'async avec block_on
     tokio::runtime::Runtime::new()
         .unwrap()
@@ -60,19 +65,19 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
             let mut buffer = Cursor::new(Vec::new());
 
             Docx::new()
-                .add_table(core_docx::titre_1("Numérologie")?)
+                .add_table(core_docx::titre_1("Numérologie").unwrap())
                 .add_paragraph(Paragraph::new().
                     add_run(Run::new()
                         .add_text("")))
-                .add_table(core_docx::titre_2("Thème")?)
-                .add_table(core_docx::theme_2(pic, "Stéphane Bressani", "03.04.1986")?)
+                .add_table(core_docx::titre_2("Thème").unwrap())
+                .add_table(core_docx::theme_2(pic, "Stéphane Bressani", "03.04.1986").unwrap())
                 .add_paragraph(Paragraph::new().
                     add_run(Run::new()
                         .add_text("")))
-                .add_table(core_docx::titre_2("Meilleur moyen pour se connecter à son intuition")?)
-                .add_table(core_docx::content_2("Le meilleur moyen...")?)
+                .add_table(core_docx::titre_2("Meilleur moyen pour se connecter à son intuition").unwrap())
+                .add_table(core_docx::content_2("Le meilleur moyen...").unwrap())
                 .build()
-                .pack(&mut buffer).expect("Panic TODO");
+                .pack(&mut buffer).expect("Panic TODO + unwrap travailler plus proprement");
 
             let b64 = general_purpose::STANDARD.encode(buffer.get_ref());
             json_payload = serde_json::json!({
