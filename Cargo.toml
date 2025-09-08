@@ -13,6 +13,8 @@ serde_json = "1.0.143"
 libc = "0.2.175"
 base64 = "0.22.1"
 image = "0.24.9"
+error = "0.1.9"
+log = "0.4.28"
 
 [lib]
 name = "theme_numerologie_docx"
