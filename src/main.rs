@@ -6,7 +6,7 @@ mod password;
 use std::fs::File;
 use std::io::Read;
 use docx_rs::*;
-use crate::api::MultiAuth;
+use crate::api::{MultiAuth, TNumerologieClient};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -17,7 +17,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Token N: {:?}", token_n);
     println!("Token T: {:?}", token_t);
 
-
+    if !token_n.is_none() {
+        let client = TNumerologieClient::new(token_t.unwrap().to_string());
+        match client.get_index(1).await {
+            Ok(numerologie) => println!("{:?}", numerologie.png_simple_b64),
+            Err(e) => eprintln!("Erreur: {:?}", e),
+        }
+    }
 
     //tools::run()?;
     let path = std::path::Path::new("./output/examples/image_inline.docx");
