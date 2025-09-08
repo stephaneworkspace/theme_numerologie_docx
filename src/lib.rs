@@ -6,7 +6,6 @@ mod password;
 use docx_rs::*;
 use crate::api::MultiAuth;
 use std::ffi::CString;
-use std::fs::File;
 use std::io::{Cursor, Read};
 use base64::engine::general_purpose;
 use base64::Engine as _;
