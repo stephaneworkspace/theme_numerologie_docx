@@ -54,6 +54,8 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
         }
     };
 
+    let mut b64 = String::new();
+
     let result = rt.block_on(async {
         // MultiAuth sécurisé
         let auth = MultiAuth::new(password_str.to_string()).await;
@@ -135,12 +137,12 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
             return Err(format!("Erreur docx: {}", e));
         }
 
-        let b64 = general_purpose::STANDARD.encode(buffer.get_ref());
+        b64 = general_purpose::STANDARD.encode(buffer.get_ref());
 
         Ok(serde_json::json!({
             "token_n": token_n,
             "token_t": token_t,
-            "docx_base64": b64
+            "docx_base64": "b64"
         }))
     });
 
@@ -151,5 +153,6 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
             CString::new(format!("{{\"error\":\"{}\"}}", msg)).unwrap()
         }
     };
-    json_cstring.into_raw()
+    //json_cstring.into_raw()
+    CString::new(b64).unwrap().into_raw()
 }
