@@ -9,6 +9,8 @@ use std::io::Read;
 use docx_rs::*;
 use docx_rs::XMLElement::Num;
 use crate::api::{MultiAuth, TNumerologieClient};
+use base64::engine::general_purpose;
+use base64::Engine;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -24,7 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let client = TNumerologieClient::new(token.to_string());
         match client.get_index(1).await {
             Ok(ok) => {
-                match base64::decode(&ok.png_simple_b64) {
+                match general_purpose::STANDARD.decode(&ok.png_simple_b64) {
                     Ok(decoded) => {
                         buf = decoded;
                     },

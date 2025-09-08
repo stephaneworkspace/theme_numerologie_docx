@@ -1,6 +1,7 @@
 use serde::Deserialize;
 use reqwest::{Client, Response};
-use base64::decode;
+use base64::engine::general_purpose;
+use base64::Engine;
 
 #[derive(Debug, Deserialize)]
 pub struct Numerologie {
@@ -71,7 +72,7 @@ impl TNumerologieClient {
 use some_image_display_crate::Pic; // Hypothetical import
 
 fn process_numerologie_image(numerologie: &Numerologie, width: u32, height: u32) -> Result<Pic, String> {
-    let buf = decode(&numerologie.png_simple_b64)
+    let buf = general_purpose::STANDARD.decode(&numerologie.png_simple_b64)
         .map_err(|e| format!("Erreur lors du décodage Base64 de png_simple_b64: {}", e))?;
     // let pic = Pic::new(&buf.as_slice()).size(width, height);
     // return Ok(pic);
