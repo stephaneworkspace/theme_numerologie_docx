@@ -1,5 +1,6 @@
 use serde::Deserialize;
 use reqwest::{Client, Response};
+use base64::decode;
 
 #[derive(Debug, Deserialize)]
 pub struct Numerologie {
@@ -61,3 +62,20 @@ impl TNumerologieClient {
         Ok(numerologie)
     }
 }
+
+// Example function showing how to decode png_simple_b64 and use it
+// This is not part of the original file, but the instructions imply modifying main.rs accordingly.
+// The following code snippet should be integrated in main.rs or wherever appropriate:
+
+/*
+use some_image_display_crate::Pic; // Hypothetical import
+
+fn process_numerologie_image(numerologie: &Numerologie, width: u32, height: u32) -> Result<Pic, String> {
+    let buf = decode(&numerologie.png_simple_b64)
+        .map_err(|e| format!("Erreur lors du décodage Base64 de png_simple_b64: {}", e))?;
+    // let pic = Pic::new(&buf.as_slice()).size(width, height);
+    // return Ok(pic);
+}
+*/
+
+// The commented out code for reading image from disk should be removed from main.rs as per instructions.
