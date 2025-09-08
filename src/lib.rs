@@ -48,16 +48,14 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
             println!("Token N: {:?}", token_n);
             println!("Token T: {:?}", token_t);
 
-            //tools::run()?;
-            let path = std::path::Path::new("./output/examples/image_inline.docx");
-            let file = File::create(path).unwrap();
-            let mut img = File::open("./images/02.png").unwrap();
-            let mut buf = Vec::new();
-            let _ = img.read_to_end(&mut buf).unwrap();
+            let img_bytes: Vec<u8> = general_purpose::STANDARD
+                .decode(png_str)
+                .expect("Base64 invalide");
 
+            // Créer le Pic
             let width = ((720 as f64) * 192.0 * 38.8).round() as u32;
             let height = ((397 as f64) * 192.0 * 38.8).round() as u32;
-            let pic = Pic::new(&buf.as_slice()).size(width, height);
+            let pic = Pic::new(&img_bytes).size(width, height);
 
             // Créer un buffer avec Cursor
             let mut buffer = Cursor::new(Vec::new());
