@@ -13,20 +13,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut buf = Vec::new();
     let _ = img.read_to_end(&mut buf).unwrap();
 
-    let pic = Pic::new(&buf.as_slice()).size(320 * 9525, 240 * 9525);
+    let width = ((720 as f64) * 192.0 * 38.8).round() as u32;
+    let height = ((397 as f64) * 192.0 * 38.8).round() as u32;
+    let pic = Pic::new(&buf.as_slice()).size(width, height);
 
     Docx::new()
-        .add_paragraph(Paragraph::new().
-            add_run(Run::new()
-                .add_text("🐱")
-               // .add_image(pic)
-            ))
         .add_table(core_docx::titre_1("Numérologie")?)
         .add_paragraph(Paragraph::new().
             add_run(Run::new()
                 .add_text("")))
-        .add_table(core_docx::titre_2("Thème : Stéphane Bressani")?)
-        .add_table(core_docx::theme_2(pic)?)
+        .add_table(core_docx::titre_2("Thème")?)
+        .add_table(core_docx::theme_2(pic, "Stéphane Bressani", "03.04.1986")?)
+        .add_paragraph(Paragraph::new().
+            add_run(Run::new()
+                .add_text("")))
+        .add_table(core_docx::titre_2("Meilleur moyen pour se connecter à son intuition")?)
+        .add_table(core_docx::content_2("Le meilleur moyen...")?)
         .build()
         .pack(file)?;
     Ok(())
