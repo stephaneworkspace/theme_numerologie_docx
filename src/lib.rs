@@ -13,7 +13,7 @@ use base64::Engine as _;
 use docx_rs::{Docx, Paragraph, Pic, Run};
 
 #[no_mangle]
-pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char, nom: *const libc::c_char, date: *const libc::c_char) -> *mut libc::c_char {
+pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char, nom: *const libc::c_char, date: *const libc::c_char) -> *const libc::c_char {
     use std::ffi::{CStr, CString};
 
     // Convertir C string en Rust string
