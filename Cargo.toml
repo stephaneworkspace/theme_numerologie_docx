@@ -7,3 +7,7 @@ edition = "2021"
 docx-rs = "0.4.18"
 zip = "0.6.6"
 roxmltree = "0.20.0"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_yaml = "0.9"
+reqwest = "0.12.23"
+tokio = { version = "1.47.1", features = ["rt", "rt-multi-thread", "macros"] }

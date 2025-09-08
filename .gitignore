@@ -1,3 +1,8 @@
 /target
 /input/~$merologie.docx
 /output/examples/~$age_inline.docx
+/output/import/
+/input/
+/Secrets.yaml
+/images/
+/output/examples/

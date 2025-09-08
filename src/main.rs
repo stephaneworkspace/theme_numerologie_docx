@@ -1,11 +1,23 @@
 mod core_docx;
+mod api;
 
 // mod tools;
 use std::fs::File;
 use std::io::Read;
 use docx_rs::*;
+use crate::api::MultiAuth;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+
+    let auth = MultiAuth::new(None).await;
+    let (token_n, token_t) = auth.get_token();
+
+    println!("Token N: {:?}", token_n);
+    println!("Token T: {:?}", token_t);
+
+
+
     //tools::run()?;
     let path = std::path::Path::new("./output/examples/image_inline.docx");
     let file = File::create(path).unwrap();
