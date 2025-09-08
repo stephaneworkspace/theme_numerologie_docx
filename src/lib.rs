@@ -15,6 +15,11 @@ use serde_json::Value;
 #[no_mangle]
 pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char, nom: *const libc::c_char, date: *const libc::c_char) -> *const libc::c_char {
     use std::ffi::{CStr, CString};
+    unsafe {
+        let name = CStr::from_ptr(nom).to_str().unwrap_or("invalid");
+        let date = CStr::from_ptr(date).to_str().unwrap_or("invalid");
+        println!("Rust theme called! name={} date={}", name, date);
+    }
 
     // Convertir C string en Rust string
     let c_str = unsafe { CStr::from_ptr(password) };
