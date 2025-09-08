@@ -23,12 +23,15 @@ fi
 if [ ! -f "$HEADER_FILE" ]; then
   echo "Le fichier header $HEADER_FILE est manquant. Création d'un header minimal."
   cat > "$HEADER_FILE" <<EOF
-#ifndef NUMEROLOGIE_EXCEL_H
-#define NUMEROLOGIE_EXCEL_H
-
+#ifndef THEME_NUMEROLOGIE_DOCX_H
+#define THEME_NUMEROLOGIE_DOCX_H
 // Header minimal pour $CRATE_NAME
 
-#endif // NUMEROLOGIE_EXCEL_H
+#include <stdint.h>
+
+const char* theme(const char* password, const char* png, const char* nom, const char* date);
+
+#endif
 EOF
 fi
 
