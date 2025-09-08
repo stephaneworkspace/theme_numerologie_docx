@@ -4,7 +4,6 @@ use std::fs::File;
 use std::io::Read;
 use docx_rs::*;
 use docx_rs::RunFonts;
-use docx_rs::XMLElement::TableWidth;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     //tools::run()?;
@@ -18,12 +17,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let table = Table::new(vec![TableRow::new(vec![
         TableCell::new()
-            .shading(Shading::new().fill("FFFF00"))
+            .shading(Shading::new().fill("d1d0d1"))
             .add_paragraph(Paragraph::new().add_run(
                 Run::new()
                     .add_text("Numérologie")
-                    .color("FF0000")
-                    .fonts(RunFonts::new().ascii("Calibri"))
+                    .size(18 * 2)
+                    .fonts(
+                        RunFonts::new()
+                            .ascii("Calibri")
+                            .hi_ansi("Calibri")
+                            .cs("Calibri")
+                    )
                     .bold()
                 ).align(AlignmentType::Left)
             )
