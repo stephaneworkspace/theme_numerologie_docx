@@ -60,13 +60,29 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
             use image::io::Reader as ImageReader;
             use image::DynamicImage;
 
-            let img_bytes: Vec<u8> = general_purpose::STANDARD
-                .decode(png_str)
-                .expect("Base64 invalide");
+            let img_bytes: Vec<u8> = match general_purpose::STANDARD.decode(png_str) {
+                Ok(bytes) => {
+                    if bytes.len() < 8 {
+                        eprintln!("Erreur: Base64 PNG décodé trop court ({} octets)", bytes.len());
+                        return;
+                    }
+                    println!("Premiers 8 octets PNG: {:?}", &bytes[0..8]);
+                    bytes
+                },
+                Err(e) => {
+                    eprintln!("Erreur de décodage Base64 PNG: {}", e);
+                    return;
+                }
+            };
 
             // Charger via image crate
-            let img = image::load_from_memory(&img_bytes.as_slice())
-                .expect("Impossible de charger l'image en mémoire");
+            let img = match image::load_from_memory(&img_bytes.as_slice()) {
+                Ok(im) => im,
+                Err(e) => {
+                    eprintln!("Impossible de charger l'image en mémoire: {}", e);
+                    return;
+                }
+            };
 
             // Réencoder en PNG standard
             let mut png_buffer = Vec::new();
