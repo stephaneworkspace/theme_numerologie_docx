@@ -1,0 +1,1 @@
+/Applications/LibreOffice.app/Contents/MacOS/soffice --headless --convert-to pdf image_inline.docx --outdir .
