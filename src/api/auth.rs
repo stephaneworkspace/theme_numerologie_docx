@@ -36,7 +36,7 @@ impl MultiAuth {
 
     async fn fetch_token(base_url: &String, password: String) -> Option<String> {
         let client = Client::new();
-        let url = format!("{}/token_ipad?password={}", base_url, password);
+        let url = format!("{}/token_rust?password={}", base_url, password);
 
         let resp: Option<Response> = client
             .post(&url)
