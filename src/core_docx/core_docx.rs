@@ -26,7 +26,11 @@ pub fn titre_1(titre: &str) -> Result<Table, Box<dyn std::error::Error>> {
             )
             .vertical_align(VAlignType::Center)
             .vertical_merge(VMergeType::Restart),
-    ])]).width(5000, WidthType::Pct);
+    ])])
+        .width(5000, WidthType::Pct)
+        .margins(
+            TableCellMargins::new()
+                .margin_top(100, WidthType::Dxa)); // Pas de content ici, donc à ajouter à chaque content
     Ok(table)
 }
 
@@ -86,7 +90,7 @@ pub fn theme_2(pic: Pic, name: &str, date: &str) -> Result<Table, Box<dyn std::e
         .width(5000, WidthType::Pct)
         .margins(
             TableCellMargins::new()
-                .margin_top(100, WidthType::Dxa));
+                .margin_top(100, WidthType::Dxa)); // A ajouter à chaque content
     Ok(table)
 }
 pub fn content_2(content: &str) -> Result<Table, Box<dyn std::error::Error>> {
@@ -103,6 +107,10 @@ pub fn content_2(content: &str) -> Result<Table, Box<dyn std::error::Error>> {
                             .cs(FONT)
                     )
             ).align(AlignmentType::Left))
-    ])]).width(5000, WidthType::Pct);
+    ])])
+        .width(5000, WidthType::Pct)
+        .margins(
+            TableCellMargins::new()
+                .margin_top(100, WidthType::Dxa)); // A ajouter à chaque content
     Ok(table)
 }
