@@ -19,12 +19,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_paragraph(Paragraph::new().
             add_run(Run::new()
                 .add_text("🐱")
-                .add_image(pic)))
+               // .add_image(pic)
+            ))
         .add_table(core_docx::titre_1("Numérologie")?)
         .add_paragraph(Paragraph::new().
             add_run(Run::new()
                 .add_text("")))
-        .add_table(core_docx::titre_2("Thème")?)
+        .add_table(core_docx::titre_2("Thème : Stéphane Bressani")?)
+        .add_table(core_docx::theme_2(pic)?)
         .build()
         .pack(file)?;
     Ok(())
