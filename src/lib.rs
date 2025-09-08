@@ -57,14 +57,26 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
             println!("Token N: {:?}", token_n);
             println!("Token T: {:?}", token_t);
 
+            use image::io::Reader as ImageReader;
+            use image::DynamicImage;
+
             let img_bytes: Vec<u8> = general_purpose::STANDARD
                 .decode(png_str)
                 .expect("Base64 invalide");
 
-            // Créer le Pic
+            // Charger via image crate
+            let img = image::load_from_memory(&img_bytes.as_slice())
+                .expect("Impossible de charger l'image en mémoire");
+
+            // Réencoder en PNG standard
+            let mut png_buffer = Vec::new();
+            img.write_to(&mut std::io::Cursor::new(&mut png_buffer), image::ImageOutputFormat::Png)
+                .expect("Impossible de réencoder PNG");
+
+            // Créer le Pic à partir du buffer réencodé
             let width = ((720 as f64) * 192.0 * 38.8).round() as u32;
             let height = ((397 as f64) * 192.0 * 38.8).round() as u32;
-            let pic = Pic::new(&img_bytes).size(width, height);
+            let pic = Pic::new(&png_buffer).size(width, height);
 
             // Créer un buffer avec Cursor
             let mut buffer = Cursor::new(Vec::new());
