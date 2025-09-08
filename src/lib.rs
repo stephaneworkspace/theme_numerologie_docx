@@ -4,7 +4,7 @@ mod password;
 
 // mod tools;
 use docx_rs::*;
-use crate::api::MultiAuth;
+use crate::api::{MultiAuth, TNumerologieClient};
 use std::ffi::CString;
 use std::io::{Cursor, Read};
 use base64::engine::general_purpose;
@@ -59,57 +59,27 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
         let auth = MultiAuth::new(password_str.to_string()).await;
         let (token_n, token_t) = auth.get_token();
 
-        // La partie PNG est temporairement désactivée
-        /*
-        // Décodage Base64 PNG
-        let img_bytes: Vec<u8> = match general_purpose::STANDARD.decode(png_str) {
-            Ok(bytes) => bytes,
-            Err(e) => {
-                error!("Erreur de décodage Base64 PNG: {}", e);
-                return Err(format!("Erreur de décodage Base64 PNG: {}", e));
-            }
-        };
-
-        // Écrire PNG dans un fichier temporaire dans tmp/
-
-
-
-
-
-
-
-
-        // FETCH DEPUIS RAILS ET BASE64 CORRECT DEPUIS RAILS
-
-
-
-
-
-
-
-
-        let tmp_dir = PathBuf::from("tmp");
-        if let Err(e) = fs::create_dir_all(&tmp_dir) {
-            error!("Erreur création dossier tmp: {}", e);
-            return Err(format!("Erreur création dossier tmp: {}", e));
-        }
-        let tmp_file_path = tmp_dir.join("temp_image.png");
-        if let Err(e) = fs::write(&tmp_file_path, &img_bytes) {
-            error!("Erreur écriture fichier PNG temporaire: {}", e);
-            return Err(format!("Erreur écriture fichier PNG temporaire: {}", e));
+        let mut buf: Vec<u8> = Vec::new();
+        let client = TNumerologieClient::new(token_t.as_ref().cloned().unwrap());
+        match client.get_index(1).await {
+            Ok(ok) => {
+                match general_purpose::STANDARD.decode(&ok.png_simple_b64) {
+                    Ok(decoded) => {
+                        buf = decoded;
+                    },
+                    Err(_) => {
+                        return Err("base64 invalide pour png_simple_b64".to_string());
+                    }
+                }
+            },
+            Err(_) => {
+                return Err("Erreur de traitement".to_string());
+            },
         }
 
-        // Lire le fichier temporaire PNG en mémoire et créer Pic depuis les bytes
-        let pic_bytes = match fs::read(&tmp_file_path) {
-            Ok(bytes) => bytes,
-            Err(e) => {
-                error!("Erreur lecture fichier PNG temporaire: {}", e);
-                return Err(format!("Erreur lecture fichier PNG temporaire: {}", e));
-            }
-        };
-        let pic = Pic::new(&pic_bytes)
-            .size(720 * 192 * 38, 397 * 192 * 38);
-        */
+        let width = ((720 as f64) * 192.0 * 38.8).round() as u32;
+        let height = ((397 as f64) * 192.0 * 38.8).round() as u32;
+        let pic = Pic::new(&buf.as_slice()).size(width, height);
 
         // Créer un buffer avec Cursor
         let mut buffer = Cursor::new(Vec::new());
@@ -121,7 +91,7 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
             .add_table(core_docx::titre_2("Thème").unwrap())
             // La partie PNG est désactivée, donc on ne passe pas de pic ici
             //.add_table(core_docx::theme_2(pic, nom_str, date_str).unwrap())
-            //.add_table(core_docx::theme_2(/*pic*/ /* Temporarily disabled */, nom_str, date_str).unwrap())
+            .add_table(core_docx::theme_2(pic, nom_str, date_str).unwrap())
             .add_paragraph(Paragraph::new().
                 add_run(Run::new()
                     .add_text("")))
