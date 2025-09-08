@@ -2,10 +2,12 @@ mod core_docx;
 mod api;
 mod password;
 
+use std::ffi::CString;
 // mod tools;
 use std::fs::File;
 use std::io::Read;
 use docx_rs::*;
+use docx_rs::XMLElement::Num;
 use crate::api::{MultiAuth, TNumerologieClient};
 
 #[tokio::main]
@@ -17,13 +19,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Token N: {:?}", token_n);
     println!("Token T: {:?}", token_t);
 
-    if !token_n.is_none() {
-        let client = TNumerologieClient::new(token_t.unwrap().to_string());
+    let mut png: String = "".to_string();
+    if let Some(token) = token_t {
+        let client = TNumerologieClient::new(token.to_string());
         match client.get_index(1).await {
-            Ok(numerologie) => println!("{:?}", numerologie.png_simple_b64),
-            Err(e) => eprintln!("Erreur: {:?}", e),
+            Ok(ok) => {
+                png = ok.png_simple_b64;
+                println!("{:?}", png);
+            },
+            Err(e) => {
+                eprintln!("Erreur de traitement: {}", e);
+                std::process::exit(1);
+            },
         }
+    } else {
+        eprintln!("Erreur: token_t vide");
+        std::process::exit(1);
     }
+    println!("{:?}", png);
 
     //tools::run()?;
     let path = std::path::Path::new("./output/examples/image_inline.docx");
