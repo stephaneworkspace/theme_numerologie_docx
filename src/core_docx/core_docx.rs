@@ -1,5 +1,7 @@
 use docx_rs::*;
 use docx_rs::RunFonts;
+use docx_rs::XMLElement::{Indent, Spacing};
+
 const FONT_SIZE_TITRE_1: usize = 18;
 const FONT_SIZE_TITRE_2: usize = 11;
 const FONT_SIZE_NORMAL: usize = 11;
@@ -23,6 +25,7 @@ pub fn titre_1(titre: &str) -> Result<Table, Box<dyn std::error::Error>> {
                     )
                     .bold()
             ).align(AlignmentType::Left)
+                .line_spacing(LineSpacing::new().after(100))
             )
             .vertical_align(VAlignType::Center)
             .vertical_merge(VMergeType::Restart),
@@ -30,7 +33,7 @@ pub fn titre_1(titre: &str) -> Result<Table, Box<dyn std::error::Error>> {
         .width(5000, WidthType::Pct)
         .margins(
             TableCellMargins::new()
-                .margin_top(100, WidthType::Dxa)); // Pas de content ici, donc à ajouter à chaque content
+                .margin_top(80, WidthType::Dxa));  // Header only
     Ok(table)
 }
 
@@ -50,6 +53,7 @@ pub fn titre_2(titre: &str) -> Result<Table, Box<dyn std::error::Error>> {
                     )
                     .bold()
             ).align(AlignmentType::Left)
+                .indent(Some(50), Some(SpecialIndentType::FirstLine(0)), Some(0), Some(0))
             )
             .vertical_align(VAlignType::Center)
             .vertical_merge(VMergeType::Restart),
