@@ -33,7 +33,7 @@ pub(crate) fn run() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // 6️⃣ Écrire le nouveau DOCX
-    let out_file = File::create("nouveau.docx")?;
+    let out_file = File::create("./output/import/nouveau.docx")?;
     new_doc.build().pack(out_file)?;
 
     println!("Nouveau DOCX créé avec succès !");
