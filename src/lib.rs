@@ -77,8 +77,8 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
             },
         }
 
-        let width = ((720 as f64) * 192.0 * 38.8).round() as u32;
-        let height = ((397 as f64) * 192.0 * 38.8).round() as u32;
+        let width = ((720 as f64) * 192.0 * 38.7).round() as u32;
+        let height = ((397 as f64) * 192.0 * 38.7).round() as u32;
         let pic = Pic::new(&buf.as_slice()).size(width, height);
 
         // Créer un buffer avec Cursor
@@ -89,8 +89,6 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
                 add_run(Run::new()
                     .add_text("")))
             .add_table(core_docx::titre_2("Thème").unwrap())
-            // La partie PNG est désactivée, donc on ne passe pas de pic ici
-            //.add_table(core_docx::theme_2(pic, nom_str, date_str).unwrap())
             .add_table(core_docx::theme_2(pic, nom_str, date_str).unwrap())
             .add_paragraph(Paragraph::new().
                 add_run(Run::new()

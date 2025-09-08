@@ -47,8 +47,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     println!("{:?}", buf);
 
-    let width = ((720 as f64) * 192.0 * 38.8).round() as u32;
-    let height = ((397 as f64) * 192.0 * 38.8).round() as u32;
+    let width = ((720 as f64) * 192.0 * 38.7).round() as u32;
+    let height = ((397 as f64) * 192.0 * 38.7).round() as u32;
     let pic = Pic::new(&buf.as_slice()).size(width, height);
 
     let path = std::path::Path::new("./output/examples/image_inline.docx");

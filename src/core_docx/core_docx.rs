@@ -82,7 +82,11 @@ pub fn theme_2(pic: Pic, name: &str, date: &str) -> Result<Table, Box<dyn std::e
                             .cs(FONT)
                     )
             ).align(AlignmentType::Left))
-    ])]).width(5000, WidthType::Pct);
+    ])])
+        .width(5000, WidthType::Pct)
+        .margins(
+            TableCellMargins::new()
+                .margin_top(100, WidthType::Dxa));
     Ok(table)
 }
 pub fn content_2(content: &str) -> Result<Table, Box<dyn std::error::Error>> {
