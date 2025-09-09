@@ -8,6 +8,25 @@ pub const SHADE_TITRE_1: &str = "d1d0d1";
 pub const SHADE_TITRE_2: &str = "e7e7e7";
 pub const FONT: &str = "Calibri";
 
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum ColorEnum {
+    Noir,
+    Bleu,
+    Rouge,
+}
+
+impl ColorEnum {
+    pub const fn hex(self) -> &'static str {
+        match self {
+            ColorEnum::Noir => "000000",
+            ColorEnum::Bleu => "0070C0", // rgb(0,112,192)
+            ColorEnum::Rouge => "FA0000", // rgb(250,0,0)
+        }
+    }
+}
+pub const BLEU_HEX: u32 = 0x0070C0; // (0,112,192)
+pub const ROUGE_HEX: u32 = 0xFA0000; // (250,0,0)
+
 pub fn titre_1(titre: &str) -> Result<Table, Box<dyn std::error::Error>> {
     let table = Table::new(vec![TableRow::new(vec![
         TableCell::new()
@@ -99,11 +118,11 @@ pub fn theme_2(pic: Pic, name: &str, date: &str) -> Result<Table, Box<dyn std::e
 use docx_rs::*;
 use crate::core_docx::parse_to_docx::parse_paragraph;
 
-pub fn content_2(content: &str) -> Result<Table, Box<dyn std::error::Error>> {
+pub fn content_2(content: &str, color: ColorEnum) -> Result<Table, Box<dyn std::error::Error>> {
 
     let table = Table::new(vec![TableRow::new(vec![TableCell::new()
                                                        .add_paragraph(
-                                                           parse_paragraph(content)
+                                                           parse_paragraph(content, color)
                                                                .size(FONT_SIZE_NORMAL * 2)
                                                                .fonts(RunFonts::new()
                                                                    .ascii(FONT)

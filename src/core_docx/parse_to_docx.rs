@@ -1,4 +1,6 @@
-use docx_rs::{Paragraph, Run, RunFonts, RunProperty, VertAlignType};
+use docx_rs::{Color, Paragraph, Run, RunFonts, RunProperty, VertAlignType};
+use regex::bytes::Replacer;
+use crate::core_docx::core_docx::ColorEnum;
 //use crate::core_docx::RunPropertyExt;
 // VertAlignType, XMLElement};
 /*
@@ -10,8 +12,10 @@ fn run_superscript(text: &str) -> Run {
         )
 }*/
 
-fn make_run(text: &str) -> Run {
+
+fn make_run(text: &str, color: &ColorEnum) -> Run {
     Run::new()
+        .color(color.hex())
         .add_text(text)
         .size(crate::core_docx::core_docx::FONT_SIZE_NORMAL * 2)
         .fonts(RunFonts::new()
@@ -20,7 +24,7 @@ fn make_run(text: &str) -> Run {
             .cs(crate::core_docx::core_docx::FONT))
 }
 
-pub fn parse_paragraph(text: &str) -> Paragraph {
+pub fn parse_paragraph(text: &str, color_enum: ColorEnum) -> Paragraph {
     let mut para = Paragraph::new();
 
     let mut remaining = text;
@@ -39,7 +43,7 @@ pub fn parse_paragraph(text: &str) -> Paragraph {
                 let (before, rest) = remaining.split_at(pos);
                 //let before = before.trim_end().replace(" ,", ",");
                 let before = before.replace(" ,", ",");
-                para = para.add_run(make_run(&before));
+                para = para.add_run(make_run(&before, &color_enum));
                 remaining = rest;
             }
 
@@ -62,10 +66,11 @@ pub fn parse_paragraph(text: &str) -> Paragraph {
                         }
                         remaining = &rest[end + 4..];
                     }
-                    para = para.add_run(make_run(&bold_text).bold());
+                    para = para.add_run(make_run(&bold_text, &color_enum).bold());
                     continue;
                 } else {
-                    para = para.add_run(make_run(remaining));
+                    para = para.add_run(make_run(remaining, &color_enum).bold());
+                    break;
                     break;
                 }
             }
@@ -74,12 +79,12 @@ pub fn parse_paragraph(text: &str) -> Paragraph {
                 let rest = &remaining[4..];
                 if let Some(end) = rest.find("III_") {
                     let italic_text = &rest[..end];
-                    para = para.add_run(make_run(italic_text).italic());
+                    para = para.add_run(make_run(italic_text, &color_enum).italic());
 
                     remaining = &rest[end + 4..];
                     continue;
                 } else {
-                    para = para.add_run(make_run(remaining));
+                    para = para.add_run(make_run(remaining, &color_enum).italic());
                     break;
                 }
             }
@@ -89,21 +94,22 @@ pub fn parse_paragraph(text: &str) -> Paragraph {
                     let underlined_text = &rest[..end];
                     let rp = RunProperty::new()
                         .vert_align(VertAlignType::SuperScript);
-                    let mut run = make_run(underlined_text).underline("single");
+                    let mut run = make_run(underlined_text, &color_enum).underline("single");
                     run.run_property = rp;
                     para = para.add_run(run);
                     remaining = &rest[end + 3..];
                     continue;
                 } else {
-                    para = para.add_run(make_run(remaining));
+                    para = para.add_run(make_run(remaining, &color_enum));
                     break;
                 }
             }
 
-            para = para.add_run(make_run(remaining));
+            para = para.add_run(make_run(remaining, &color_enum));
             break;
         } else {
-            para = para.add_run(make_run(remaining));
+            para = para.add_run(make_run(remaining, &color_enum));
+            break;
             break;
         }
     }

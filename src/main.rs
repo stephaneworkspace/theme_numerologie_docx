@@ -12,6 +12,7 @@ use docx_rs::XMLElement::Num;
 use crate::api::{MultiAuth, TNumerologieClient};
 use base64::engine::general_purpose;
 use base64::Engine;
+use crate::core_docx::ColorEnum;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -24,6 +25,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut buf: Vec<u8> = Vec::new();
     let mut cai: String = String::new();
+    let mut cai_b: String = String::new();
+    let mut cai_r: String = String::new();
     if let Some(t_n) = token_n {
         if let Some(t_t) = token_t {
             let client = TNumerologieClient::new(t_n, t_t);
@@ -33,8 +36,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         Ok(decoded) => {
                             buf = decoded;
                             if let Some((_, text)) = ok.get_cai().await.ok() {
-                                cai = html_tools::extract_supers_and_bold_and_italic(&text.as_str());
-                                println!("{}", html_tools::extract_supers_and_bold_and_italic(&text.as_str()));
+                                if let Some(text) = text {
+                                    cai = html_tools::extract_supers_and_bold_and_italic(&text.html_body_one_note_raw.as_str());
+                                    cai_b = html_tools::extract_supers_and_bold_and_italic(&text.html_body_one_note_raw_b.as_str());
+                                    cai_r = html_tools::extract_supers_and_bold_and_italic(&text.html_body_one_note_raw_r.as_str());
+                                }
                             } else {
                                 println!("Aucun contenu disponible");
                             }
@@ -78,7 +84,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             add_run(Run::new()
                 .add_text("")))
         .add_table(core_docx::titre_2("Caractère intérieur")?)
-        .add_table(core_docx::content_2(cai.as_str())?)
+        .add_table(core_docx::content_2(cai.as_str(), ColorEnum::Noir)?)
+        .add_table(core_docx::content_2(cai_b.as_str(), ColorEnum::Bleu)?)
+        .add_table(core_docx::content_2(cai_r.as_str(), ColorEnum::Rouge)?)
         .build()
         .pack(file)?;
     Ok(())

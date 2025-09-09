@@ -2,7 +2,7 @@ use serde::Deserialize;
 use reqwest::{Client, Error, Response};
 use base64::engine::general_purpose;
 use base64::Engine;
-use crate::api::LameMajeureDetail;
+use crate::api::{LameMajeureDetail, NumerologieCaractereIntime};
 
 pub struct ThemeNumerologie {
     base_url: String,
@@ -22,7 +22,7 @@ impl ThemeNumerologie {
 
 
     // Personalité profonde
-    pub async fn get_cai(&self) ->  Result<(&i32, String), reqwest::Error> {
+    pub async fn get_cai(&self) ->  Result<(&i32, Option<NumerologieCaractereIntime>), reqwest::Error> {
         let url = format!("{}/api/lame_majeures/{}", self.base_url, 2);
         let client = Client::new();
         let resp: Response =
@@ -45,7 +45,7 @@ impl ThemeNumerologie {
         } else {
             let lame_majeure_detail: LameMajeureDetail = resp.json().await?;
             let cai = lame_majeure_detail.numerologie_caractere_intime;
-            Ok((&self.numerologie.interpretation_cai, cai.unwrap().html_body_one_note_raw))
+            Ok((&self.numerologie.interpretation_cai, cai))
         }
     }
 }
