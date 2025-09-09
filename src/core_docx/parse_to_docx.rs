@@ -1,4 +1,14 @@
-use docx_rs::{Paragraph, Run, RunFonts};
+use docx_rs::{Paragraph, Run, RunFonts, RunProperty, VertAlignType};
+//use crate::core_docx::RunPropertyExt;
+// VertAlignType, XMLElement};
+/*
+fn run_superscript(text: &str) -> Run {
+    Run::new()
+        .add_text(text)
+        .add_child(
+            RawXML::new(r#"<w:rPr><w:vertAlign w:val="superscript"/></w:rPr>"#)
+        )
+}*/
 
 fn make_run(text: &str) -> Run {
     Run::new()
@@ -73,12 +83,15 @@ pub fn parse_paragraph(text: &str) -> Paragraph {
                     break;
                 }
             }
-
             if remaining.starts_with("###") {
                 let rest = &remaining[3..];
                 if let Some(end) = rest.find("###") {
                     let underlined_text = &rest[..end];
-                    para = para.add_run(make_run(underlined_text).underline("single"));
+                    let rp = RunProperty::new()
+                        .vert_align(VertAlignType::SuperScript);
+                    let mut run = make_run(underlined_text).underline("single");
+                    run.run_property = rp;
+                    para = para.add_run(run);
                     remaining = &rest[end + 3..];
                     continue;
                 } else {
