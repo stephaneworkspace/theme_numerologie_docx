@@ -195,6 +195,8 @@ pub struct NumerologiePersonaliteProfonde {
     pub id: String,
     pub lame_majeure_id: u32,
     pub html_body_one_note_raw: String,
+    pub html_body_one_note_raw_r: String,
+    pub html_body_one_note_raw_b: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -204,6 +206,8 @@ pub struct NumerologieCaractereIntime {
     pub id: String,
     pub lame_majeure_id: u32,
     pub html_body_one_note_raw: String,
+    pub html_body_one_note_raw_r: String,
+    pub html_body_one_note_raw_b: String,
     pub html_body_one_note_raw_intuition: String,
     pub html_body_one_note_raw_intuition_metaphore: String,
     pub nombre_ami: String,
@@ -227,6 +231,8 @@ pub struct NumerologieCaractereSocial {
     pub id: String,
     pub lame_majeure_id: u32,
     pub html_body_one_note_raw: String,
+    pub html_body_one_note_raw_r: String,
+    pub html_body_one_note_raw_b: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -236,6 +242,8 @@ pub struct NumerologieNoeudEmotionnel {
     pub id: String,
     pub lame_majeure_id: u32,
     pub html_body_one_note_raw: String,
+    pub html_body_one_note_raw_r: String,
+    pub html_body_one_note_raw_b: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -245,6 +253,8 @@ pub struct NumerologieComportementIntime {
     pub id: String,
     pub lame_majeure_id: u32,
     pub html_body_one_note_raw: String,
+    pub html_body_one_note_raw_r: String,
+    pub html_body_one_note_raw_b: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -254,6 +264,8 @@ pub struct NumerologieComportementSocial {
     pub id: String,
     pub lame_majeure_id: u32,
     pub html_body_one_note_raw: String,
+    pub html_body_one_note_raw_r: String,
+    pub html_body_one_note_raw_b: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -263,6 +275,8 @@ pub struct NumerologiePersonaliteExterieure {
     pub id: String,
     pub lame_majeure_id: u32,
     pub html_body_one_note_raw: String,
+    pub html_body_one_note_raw_r: String,
+    pub html_body_one_note_raw_b: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
