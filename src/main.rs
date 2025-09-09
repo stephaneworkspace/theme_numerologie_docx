@@ -12,7 +12,6 @@ use docx_rs::XMLElement::Num;
 use crate::api::{MultiAuth, TNumerologieClient};
 use base64::engine::general_purpose;
 use base64::Engine;
-use crate::core_docx::ColorEnum;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -84,9 +83,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             add_run(Run::new()
                 .add_text("")))
         .add_table(core_docx::titre_2("Caractère intérieur")?)
-        .add_table(core_docx::content_2(cai.as_str(), ColorEnum::Noir)?)
-        .add_table(core_docx::content_2(cai_b.as_str(), ColorEnum::Bleu)?)
-        .add_table(core_docx::content_2(cai_r.as_str(), ColorEnum::Rouge)?)
+        .add_table(core_docx::content_2_trois_etape(cai.as_str(), cai_b.as_str(),cai_r.as_str())?)
         .build()
         .pack(file)?;
     Ok(())
