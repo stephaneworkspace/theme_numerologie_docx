@@ -104,126 +104,103 @@ pub fn content_2(content: &str) -> Result<Table, Box<dyn std::error::Error>> {
         let mut remaining = text;
 
         while !remaining.is_empty() {
-            // ===== Bold =====
-            if let Some(start) = remaining.find("_BBB") {
-                let (before, rest) = remaining.split_at(start);
-                if !before.is_empty() {
+            let pos_bold = remaining.find("_BBB");
+            let pos_italic = remaining.find("III_");
+            let pos_underline = remaining.find("###");
+
+            // Find the earliest marker position
+            let min_pos = [pos_bold, pos_italic, pos_underline].iter()
+                .filter_map(|&p| p)
+                .min();
+
+            if let Some(pos) = min_pos {
+                // Add text before the marker as normal run if any
+                if pos > 0 {
+                    let (before, rest) = remaining.split_at(pos);
                     para = para.add_run(Run::new().add_text(before));
+                    remaining = rest;
                 }
 
-                let rest = &rest[4..]; // on enlève "_BBB"
+                if let Some(start_pos) = remaining.find("_BBB") {
+                    if start_pos == 0 {
+                        let rest = &remaining[4..]; // remove "_BBB"
+                        if let Some(end) = rest.find("BBB_") {
+                            let bold_text = &rest[..end];
 
-                if let Some(end) = rest.find("BBB_") {
-                    let mut bold_text = &rest[..end]; // texte entre _BBB et BBB_
+                            // Add space if next char after closing marker is not whitespace or ','
+                            let bold_run_text = if let Some(next_char) = rest[end + 4..].chars().next() {
+                                if !next_char.is_whitespace() && next_char != ',' {
+                                    format!("{} ", bold_text)
+                                } else {
+                                    bold_text.to_string()
+                                }
+                            } else {
+                                bold_text.to_string()
+                            };
 
-                    // Ajouter un espace si le caractère suivant n'est pas déjà un espace
-                    let bold_run_text = if let Some(next_char) = rest[end + 4..].chars().next() {
-                        if !next_char.is_whitespace() && next_char != ',' {
-                            format!("{} ", bold_text) // nouvelle String
+                            para = para.add_run(Run::new().add_text(bold_run_text).bold());
+
+                            remaining = &rest[end + 4..];
+                            continue;
                         } else {
-                            bold_text.to_string() // convertir &str en String
+                            // No closing marker, treat as literal
+                            para = para.add_run(Run::new().add_text(remaining));
+                            break;
                         }
-                    } else {
-                        bold_text.to_string()
-                    };
-
-                    para = para.add_run(Run::new().add_text(bold_run_text).bold());
-
-                    remaining = &rest[end + 4..]; // après la fermeture
-                    continue;
-                } else { break; }
-            }
-            // ===== Italic =====
-            else if let Some(start) = remaining.find("III_") {
-                let (before, rest) = remaining.split_at(start);
-                if !before.is_empty() {
-                    para = para.add_run(Run::new().add_text(before));
-                }
-
-                let rest = &rest[4..]; // on enlève "III_"
-
-                if let Some(end) = rest.find("III_") {
-                    let mut italic_text = &rest[..end];
-
-                    let italic_run_text = if let Some(next_char) = rest[end + 4..].chars().next() {
-                        if !next_char.is_whitespace() && next_char != ',' {
-                            format!("{} ", italic_text)
-                        } else {
-                            italic_text.to_string()
-                        }
-                    } else {
-                        italic_text.to_string()
-                    };
-
-                    para = para.add_run(Run::new().add_text(italic_run_text).italic());
-
-                    remaining = &rest[end + 4..]; // après la fermeture
-                    continue;
-                } else { break; }
-            }
-            // ===== Underline =====
-            else if let Some(start) = remaining.find("###") {
-                let (before, rest) = remaining.split_at(start);
-                if !before.is_empty() {
-                    para = para.add_run(Run::new().add_text(before));
-                }
-
-                let rest = &rest[3..]; // on enlève la première balise "###"
-
-                if let Some(end) = rest.find("###") {
-                    let underlined_text = &rest[..end];
-
-                    para = para.add_run(Run::new()
-                        .add_text(underlined_text)
-                        .underline("single"));
-
-                    remaining = &rest[end + 3..]; // avancer après la fermeture
-                    continue;
-                } else {
-                    // si balise fermante manquante, on ajoute le reste tel quel
-                    para = para.add_run(Run::new().add_text("###").add_text(rest));
-                    break;
-                }
-            }
-                /*
-            // ===== Superscript (désactivé) =====
-            else if let Some(start) = remaining.find("###") {
-                let (before, rest) = remaining.split_at(start);
-                if !before.is_empty() {
-                    para = para.add_run(Run::new().add_text(before));
-                }
-                /*
-                                if let Some(end) = rest[3..].find("###") {
-                                    let sup_text = &rest[3..3 + end];
-                                    // Superscript désactivé pour l'instant
-                                    para = para.add_run(Run::new().add_text(sup_text).property(RunProperties::new().vert_align(VerticalAlignType::Superscript)));
-
-                                    remaining = &rest[3 + end + 3..];
-                                    continue;
-                                } else { break; }
-                            }
-                            */
-                if let Some(start) = remaining.find("###") {
-                    let (before, rest) = remaining.split_at(start);
-                    if !before.is_empty() {
-                        para = para.add_run(Run::new().add_text(before));
                     }
-
-                    if let Some(end) = rest[3..].find("###") {
-                        let underlined_text = &rest[3..3 + end];
-
-                        // Crée un Run souligné
-                        para = para.add_run(Run::new()
-                            .add_text(underlined_text)
-                            .underline("single"));
-
-                        remaining = &rest[3 + end + 3..];
-                        continue;
-                    } else { break; }
                 }
-            }*/
-            // ===== Texte normal =====
-            else {
+
+                if let Some(start_pos) = remaining.find("III_") {
+                    if start_pos == 0 {
+                        let rest = &remaining[4..]; // remove "III_"
+                        if let Some(end) = rest.find("III_") {
+                            let italic_text = &rest[..end];
+
+                            let italic_run_text = if let Some(next_char) = rest[end + 4..].chars().next() {
+                                if !next_char.is_whitespace() && next_char != ',' {
+                                    format!("{} ", italic_text)
+                                } else {
+                                    italic_text.to_string()
+                                }
+                            } else {
+                                italic_text.to_string()
+                            };
+
+                            para = para.add_run(Run::new().add_text(italic_run_text).italic());
+
+                            remaining = &rest[end + 4..];
+                            continue;
+                        } else {
+                            // No closing marker, treat as literal
+                            para = para.add_run(Run::new().add_text(remaining));
+                            break;
+                        }
+                    }
+                }
+
+                if let Some(start_pos) = remaining.find("###") {
+                    if start_pos == 0 {
+                        let rest = &remaining[3..]; // remove opening "###"
+                        if let Some(end) = rest.find("###") {
+                            let underlined_text = &rest[..end];
+                            para = para.add_run(Run::new()
+                                .add_text(underlined_text)
+                                .underline("single"));
+                            remaining = &rest[end + 3..];
+                            continue;
+                        } else {
+                            // No closing marker, treat as literal
+                            para = para.add_run(Run::new().add_text(remaining));
+                            break;
+                        }
+                    }
+                }
+
+                // If marker not at start (should not happen due to above split), treat as normal text
+                para = para.add_run(Run::new().add_text(remaining));
+                break;
+            } else {
+                // No markers found, add remaining as normal text and break
                 para = para.add_run(Run::new().add_text(remaining));
                 break;
             }
