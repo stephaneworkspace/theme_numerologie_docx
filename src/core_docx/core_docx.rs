@@ -1,6 +1,5 @@
 use docx_rs::*;
 use docx_rs::RunFonts;
-use docx_rs::XMLElement::{Indent, Spacing};
 
 const FONT_SIZE_TITRE_1: usize = 18;
 const FONT_SIZE_TITRE_2: usize = 11;
@@ -119,7 +118,7 @@ pub fn content_2(content: &str) -> Result<Table, Box<dyn std::error::Error>> {
 
                     // Ajouter un espace si le caractère suivant n'est pas déjà un espace
                     let bold_run_text = if let Some(next_char) = rest[end + 4..].chars().next() {
-                        if !next_char.is_whitespace() {
+                        if !next_char.is_whitespace() || next_char == ','{
                             format!("{} ", bold_text) // nouvelle String
                         } else {
                             bold_text.to_string() // convertir &str en String
@@ -147,7 +146,7 @@ pub fn content_2(content: &str) -> Result<Table, Box<dyn std::error::Error>> {
                     let mut italic_text = &rest[..end];
 
                     let italic_run_text = if let Some(next_char) = rest[end + 4..].chars().next() {
-                        if !next_char.is_whitespace() {
+                        if !next_char.is_whitespace() || next_char == ','{
                             format!("{} ", italic_text)
                         } else {
                             italic_text.to_string()
@@ -168,16 +167,35 @@ pub fn content_2(content: &str) -> Result<Table, Box<dyn std::error::Error>> {
                 if !before.is_empty() {
                     para = para.add_run(Run::new().add_text(before));
                 }
+                /*
+                                if let Some(end) = rest[3..].find("###") {
+                                    let sup_text = &rest[3..3 + end];
+                                    // Superscript désactivé pour l'instant
+                                    para = para.add_run(Run::new().add_text(sup_text).property(RunProperties::new().vert_align(VerticalAlignType::Superscript)));
 
-                if let Some(end) = rest[3..].find("###") {
-                    let sup_text = &rest[3..3 + end];
-                    // Superscript désactivé pour l'instant
-                    // para = para.add_run(Run::new().add_text(sup_text).property(RunProperties::new().vert_align(VerticalAlignType::Superscript)));
-                    para = para.add_run(Run::new().add_text(sup_text));
+                                    remaining = &rest[3 + end + 3..];
+                                    continue;
+                                } else { break; }
+                            }
+                            */
+                if let Some(start) = remaining.find("###") {
+                    let (before, rest) = remaining.split_at(start);
+                    if !before.is_empty() {
+                        para = para.add_run(Run::new().add_text(before));
+                    }
 
-                    remaining = &rest[3 + end + 3..];
-                    continue;
-                } else { break; }
+                    if let Some(end) = rest[3..].find("###") {
+                        let underlined_text = &rest[3..3 + end];
+
+                        // Crée un Run souligné
+                        para = para.add_run(Run::new()
+                            .add_text(underlined_text)
+                            .underline("single"));
+
+                        remaining = &rest[3 + end + 3..];
+                        continue;
+                    } else { break; }
+                }
             }
             // ===== Texte normal =====
             else {
