@@ -23,6 +23,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Token T: {:?}", token_t);
 
     let mut buf: Vec<u8> = Vec::new();
+    let mut cai: String = String::new();
     if let Some(t_n) = token_n {
         if let Some(t_t) = token_t {
             let client = TNumerologieClient::new(t_n, t_t);
@@ -32,11 +33,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         Ok(decoded) => {
                             buf = decoded;
                             if let Some((_, text)) = ok.get_cai().await.ok() {
-                                println!("{}", html_tools::extract_supers(&text.as_str()));
+                                cai = html_tools::extract_supers_and_bold_and_italic(&text.as_str());
+                                println!("{}", html_tools::extract_supers_and_bold_and_italic(&text.as_str()));
                             } else {
                                 println!("Aucun contenu disponible");
                             }
-                            println!("{:?}", &ok.get_cai().await.ok());
                         },
                         Err(_) => {
                             eprintln!("Erreur: base64 invalide pour png_simple_b64");
@@ -76,8 +77,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_paragraph(Paragraph::new().
             add_run(Run::new()
                 .add_text("")))
-        .add_table(core_docx::titre_2("Meilleur moyen pour se connecter à son intuition")?)
-        .add_table(core_docx::content_2("Le meilleur moyen...")?)
+        .add_table(core_docx::titre_2("Caractère intérieur")?)
+        .add_table(core_docx::content_2(cai.as_str())?)
         .build()
         .pack(file)?;
     Ok(())

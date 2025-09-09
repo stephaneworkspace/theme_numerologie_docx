@@ -15,7 +15,7 @@ pub fn clean_html(html: &String) -> String {
     plain_text.replace("\n", " ").replace("\r", " ").split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
-pub fn extract_supers(html: &str) -> String {
+pub fn extract_supers_and_bold_and_italic(html: &str) -> String {
     let document = Html::parse_fragment(html);
 
     // Sélecteurs pour les différents styles
