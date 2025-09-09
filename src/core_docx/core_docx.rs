@@ -1,12 +1,12 @@
 use docx_rs::*;
 use docx_rs::RunFonts;
 
-const FONT_SIZE_TITRE_1: usize = 18;
-const FONT_SIZE_TITRE_2: usize = 11;
-const FONT_SIZE_NORMAL: usize = 11;
-const SHADE_TITRE_1: &str = "d1d0d1";
-const SHADE_TITRE_2: &str = "e7e7e7";
-const FONT: &str = "Calibri";
+pub const FONT_SIZE_TITRE_1: usize = 18;
+pub const FONT_SIZE_TITRE_2: usize = 11;
+pub const FONT_SIZE_NORMAL: usize = 11;
+pub const SHADE_TITRE_1: &str = "d1d0d1";
+pub const SHADE_TITRE_2: &str = "e7e7e7";
+pub const FONT: &str = "Calibri";
 
 pub fn titre_1(titre: &str) -> Result<Table, Box<dyn std::error::Error>> {
     let table = Table::new(vec![TableRow::new(vec![
