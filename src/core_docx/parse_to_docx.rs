@@ -36,6 +36,15 @@ pub fn parse_paragraph(text: &str) -> Paragraph {
                 if let Some(end) = rest.find("BBB_") {
                     let bold_text = &rest[..end];
                     para = para.add_run(make_run(bold_text).bold());
+
+                    // vérifie si le prochain caractère n’est pas un espace ou une virgule
+                    if let Some(next_char) = rest[end..].chars().next() {
+                        if !next_char.is_whitespace() && next_char != ',' {
+                            // ajoute un espace “neutre” pour Word
+                            para = para.add_run(make_run("\u{00A0}"));
+                        }
+                    }
+
                     remaining = &rest[end + 4..];
                     continue;
                 } else {
@@ -49,6 +58,15 @@ pub fn parse_paragraph(text: &str) -> Paragraph {
                 if let Some(end) = rest.find("III_") {
                     let italic_text = &rest[..end];
                     para = para.add_run(make_run(italic_text).italic());
+
+                    // vérifie si le prochain caractère n’est pas un espace ou une virgule
+                    if let Some(next_char) = rest[end..].chars().next() {
+                        if !next_char.is_whitespace() && next_char != ',' {
+                            // ajoute un espace “neutre” pour Word
+                            para = para.add_run(make_run("\u{00A0}"));
+                        }
+                    }
+
                     remaining = &rest[end + 4..];
                     continue;
                 } else {
