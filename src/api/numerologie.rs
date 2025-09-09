@@ -20,7 +20,7 @@ impl ThemeNumerologie {
     }
 
     // Personalité profonde
-    pub async fn get_pp(&self) ->  Result<(&i32, String), reqwest::Error> {
+    pub async fn get_cai(&self) ->  Result<(&i32, String), reqwest::Error> {
         let url = format!("{}/api/lame_majeures/{}", self.base_url, 2);
         let client = Client::new();
         let resp: Response =
@@ -39,8 +39,8 @@ impl ThemeNumerologie {
             Err(e) => println!("Erreur de désérialisation: {}", e),
         } */
         let lame_majeure_detail: LameMajeureDetail = resp.json().await?;
-        let note_de_cours = lame_majeure_detail.numerologie_note_de_cours;
-        Ok((&self.numerologie.interpretation_ppr, note_de_cours[0].html_body_one_note_raw.clone()))
+        let cai = lame_majeure_detail.numerologie_caractere_intime;
+        Ok((&self.numerologie.interpretation_cai, cai.unwrap().html_body_one_note_raw))
     }
 }
 

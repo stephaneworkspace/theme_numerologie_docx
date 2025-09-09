@@ -1,6 +1,7 @@
 mod core_docx;
 mod api;
 mod password;
+mod html_tools;
 
 use std::ffi::CString;
 // mod tools;
@@ -25,12 +26,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if let Some(t_n) = token_n {
         if let Some(t_t) = token_t {
             let client = TNumerologieClient::new(t_n, t_t);
-            match client.get_index(1).await {
+            match client.get_index(43).await {
                 Ok(ok) => {
                     match general_purpose::STANDARD.decode(&ok.numerologie.png_simple_b64) {
                         Ok(decoded) => {
                             buf = decoded;
-                            println!("{:?}", &ok.get_pp().await.ok());
+                            if let Some((_, text)) = ok.get_cai().await.ok() {
+                                println!("{}", html_tools::clean_html(&text));
+                            } else {
+                                println!("Aucun contenu disponible");
+                            }
+                            println!("{:?}", &ok.get_cai().await.ok());
                         },
                         Err(_) => {
                             eprintln!("Erreur: base64 invalide pour png_simple_b64");
