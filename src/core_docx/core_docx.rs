@@ -118,7 +118,7 @@ pub fn content_2(content: &str) -> Result<Table, Box<dyn std::error::Error>> {
 
                     // Ajouter un espace si le caractère suivant n'est pas déjà un espace
                     let bold_run_text = if let Some(next_char) = rest[end + 4..].chars().next() {
-                        if !next_char.is_whitespace() || next_char == ','{
+                        if !next_char.is_whitespace() && next_char != ',' {
                             format!("{} ", bold_text) // nouvelle String
                         } else {
                             bold_text.to_string() // convertir &str en String
@@ -146,7 +146,7 @@ pub fn content_2(content: &str) -> Result<Table, Box<dyn std::error::Error>> {
                     let mut italic_text = &rest[..end];
 
                     let italic_run_text = if let Some(next_char) = rest[end + 4..].chars().next() {
-                        if !next_char.is_whitespace() || next_char == ','{
+                        if !next_char.is_whitespace() && next_char != ',' {
                             format!("{} ", italic_text)
                         } else {
                             italic_text.to_string()
@@ -161,6 +161,31 @@ pub fn content_2(content: &str) -> Result<Table, Box<dyn std::error::Error>> {
                     continue;
                 } else { break; }
             }
+            // ===== Underline =====
+            else if let Some(start) = remaining.find("###") {
+                let (before, rest) = remaining.split_at(start);
+                if !before.is_empty() {
+                    para = para.add_run(Run::new().add_text(before));
+                }
+
+                let rest = &rest[3..]; // on enlève la première balise "###"
+
+                if let Some(end) = rest.find("###") {
+                    let underlined_text = &rest[..end];
+
+                    para = para.add_run(Run::new()
+                        .add_text(underlined_text)
+                        .underline("single"));
+
+                    remaining = &rest[end + 3..]; // avancer après la fermeture
+                    continue;
+                } else {
+                    // si balise fermante manquante, on ajoute le reste tel quel
+                    para = para.add_run(Run::new().add_text("###").add_text(rest));
+                    break;
+                }
+            }
+                /*
             // ===== Superscript (désactivé) =====
             else if let Some(start) = remaining.find("###") {
                 let (before, rest) = remaining.split_at(start);
@@ -196,7 +221,7 @@ pub fn content_2(content: &str) -> Result<Table, Box<dyn std::error::Error>> {
                         continue;
                     } else { break; }
                 }
-            }
+            }*/
             // ===== Texte normal =====
             else {
                 para = para.add_run(Run::new().add_text(remaining));
