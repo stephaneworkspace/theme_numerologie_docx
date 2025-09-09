@@ -27,25 +27,35 @@ pub fn parse_paragraph(text: &str) -> Paragraph {
         if let Some(pos) = min_pos {
             if pos > 0 {
                 let (before, rest) = remaining.split_at(pos);
-                para = para.add_run(make_run(before));
+                //let before = before.trim_end().replace(" ,", ",");
+                let before = before.replace(" ,", ",");
+                para = para.add_run(make_run(&before));
                 remaining = rest;
             }
 
             if remaining.starts_with("_BBB") {
                 let rest = &remaining[4..];
                 if let Some(end) = rest.find("BBB_") {
-                    let bold_text = &rest[..end];
-                    para = para.add_run(make_run(bold_text).bold());
-
-                    // vérifie si le prochain caractère n’est pas un espace ou une virgule
-                    if let Some(next_char) = rest[end..].chars().next() {
-                        if !next_char.is_whitespace() && next_char != ',' {
-                            // ajoute un espace “neutre” pour Word
-                            para = para.add_run(make_run("\u{00A0}"));
+                    let mut bold_text = rest[..end].to_string();
+                    let mut addSpace = false;
+                    // regarde si le texte qui suit le marqueur commence par " ,"
+                    if rest[end..].starts_with(" ,") {
+                        // supprime l'espace avant la virgule et inclut la virgule dans le Run
+                        bold_text.push(',');
+                        remaining = &rest[end + 2..]; // saute l'espace + virgule
+                    } else {
+                        if let Some(next_char) = rest[end + 4..].chars().next() {
+                            if !next_char.is_whitespace() && next_char != ',' {
+                                // ajoute un espace “neutre” pour Word
+                                addSpace = true;
+                            }
                         }
+                        if addSpace {
+                            bold_text.push(' ');
+                        }
+                        remaining = &rest[end + 4..];
                     }
-
-                    remaining = &rest[end + 4..];
+                    para = para.add_run(make_run(&bold_text).bold());
                     continue;
                 } else {
                     para = para.add_run(make_run(remaining));
@@ -58,14 +68,6 @@ pub fn parse_paragraph(text: &str) -> Paragraph {
                 if let Some(end) = rest.find("III_") {
                     let italic_text = &rest[..end];
                     para = para.add_run(make_run(italic_text).italic());
-
-                    // vérifie si le prochain caractère n’est pas un espace ou une virgule
-                    if let Some(next_char) = rest[end..].chars().next() {
-                        if !next_char.is_whitespace() && next_char != ',' {
-                            // ajoute un espace “neutre” pour Word
-                            para = para.add_run(make_run("\u{00A0}"));
-                        }
-                    }
 
                     remaining = &rest[end + 4..];
                     continue;
