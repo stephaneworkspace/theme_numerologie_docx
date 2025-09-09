@@ -32,7 +32,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         Ok(decoded) => {
                             buf = decoded;
                             if let Some((_, text)) = ok.get_cai().await.ok() {
-                                println!("{}", html_tools::clean_html(&text));
+                                println!("{}", html_tools::extract_supers(&text.as_str()));
                             } else {
                                 println!("Aucun contenu disponible");
                             }
