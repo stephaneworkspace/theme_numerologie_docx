@@ -48,7 +48,7 @@ pub fn parse_paragraph(text: &str) -> Paragraph {
                             }
                         }
                         if addSpace {
-                            bold_text.push(' ');
+                            bold_text.push('\u{00A0}');
                         }
                         remaining = &rest[end + 4..];
                     }
