@@ -105,50 +105,82 @@ pub fn content_2(content: &str) -> Result<Table, Box<dyn std::error::Error>> {
         let mut remaining = text;
 
         while !remaining.is_empty() {
+            // ===== Bold =====
             if let Some(start) = remaining.find("_BBB") {
                 let (before, rest) = remaining.split_at(start);
                 if !before.is_empty() {
                     para = para.add_run(Run::new().add_text(before));
                 }
 
-                // On coupe l'ouverture "_BBB" (4 caractères)
-                let rest = &rest[4..];
+                let rest = &rest[4..]; // on enlève "_BBB"
 
                 if let Some(end) = rest.find("BBB_") {
-                    let bold_text = &rest[..end]; // texte entre _BBB et BBB_
-                    para = para.add_run(Run::new().add_text(bold_text).bold());
+                    let mut bold_text = &rest[..end]; // texte entre _BBB et BBB_
 
-                    // on avance après la balise fermante "BBB_" (4 caractères)
-                    remaining = &rest[end + 4..];
+                    // Ajouter un espace si le caractère suivant n'est pas déjà un espace
+                    let bold_run_text = if let Some(next_char) = rest[end + 4..].chars().next() {
+                        if !next_char.is_whitespace() {
+                            format!("{} ", bold_text) // nouvelle String
+                        } else {
+                            bold_text.to_string() // convertir &str en String
+                        }
+                    } else {
+                        bold_text.to_string()
+                    };
+
+                    para = para.add_run(Run::new().add_text(bold_run_text).bold());
+
+                    remaining = &rest[end + 4..]; // après la fermeture
                     continue;
                 } else { break; }
-            } else if let Some(start) = remaining.find("III_") {
+            }
+            // ===== Italic =====
+            else if let Some(start) = remaining.find("III_") {
                 let (before, rest) = remaining.split_at(start);
                 if !before.is_empty() {
                     para = para.add_run(Run::new().add_text(before));
                 }
-                if let Some(end) = rest[4..].find("III_") {
-                    let italic_text = &rest[4..4 + end];
-                    para = para.add_run(Run::new().add_text(italic_text).italic());
-                    remaining = &rest[5 + end + 4..];
+
+                let rest = &rest[4..]; // on enlève "III_"
+
+                if let Some(end) = rest.find("III_") {
+                    let mut italic_text = &rest[..end];
+
+                    let italic_run_text = if let Some(next_char) = rest[end + 4..].chars().next() {
+                        if !next_char.is_whitespace() {
+                            format!("{} ", italic_text)
+                        } else {
+                            italic_text.to_string()
+                        }
+                    } else {
+                        italic_text.to_string()
+                    };
+
+                    para = para.add_run(Run::new().add_text(italic_run_text).italic());
+
+                    remaining = &rest[end + 4..]; // après la fermeture
                     continue;
                 } else { break; }
-            } else if let Some(start) = remaining.find("###") {
+            }
+            // ===== Superscript (désactivé) =====
+            else if let Some(start) = remaining.find("###") {
                 let (before, rest) = remaining.split_at(start);
                 if !before.is_empty() {
                     para = para.add_run(Run::new().add_text(before));
                 }
+
                 if let Some(end) = rest[3..].find("###") {
                     let sup_text = &rest[3..3 + end];
-                    // Texte en exposant avec RunProperties
-                    let sup_run = Run::new()
-                        .add_text(sup_text);
-                       // .property(RunProperties::new().vert_align(VerticalAlignType::Superscript));
-                    para = para.add_run(sup_run);
+                    // Superscript désactivé pour l'instant
+                    // para = para.add_run(Run::new().add_text(sup_text).property(RunProperties::new().vert_align(VerticalAlignType::Superscript)));
+                    para = para.add_run(Run::new().add_text(sup_text));
+
                     remaining = &rest[3 + end + 3..];
                     continue;
                 } else { break; }
-            } else {
+            }
+            // ===== Texte normal =====
+            else {
                 para = para.add_run(Run::new().add_text(remaining));
                 break;
             }
