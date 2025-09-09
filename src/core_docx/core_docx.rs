@@ -97,24 +97,76 @@ pub fn theme_2(pic: Pic, name: &str, date: &str) -> Result<Table, Box<dyn std::e
                 .margin_top(100, WidthType::Dxa)); // A ajouter à chaque content
     Ok(table)
 }
+use docx_rs::*;
+
 pub fn content_2(content: &str) -> Result<Table, Box<dyn std::error::Error>> {
-    let table = Table::new(vec![TableRow::new(vec![
-        TableCell::new()
-            .add_paragraph(Paragraph::new().add_run(
-                Run::new()
-                    .add_text(content)
-                    .size(FONT_SIZE_NORMAL * 2)
-                    .fonts(
-                        RunFonts::new()
-                            .ascii(FONT)
-                            .hi_ansi(FONT)
-                            .cs(FONT)
-                    )
-            ).align(AlignmentType::Left))
+    fn parse_paragraph(text: &str) -> Paragraph {
+        let mut para = Paragraph::new();
+        let mut remaining = text;
+
+        while !remaining.is_empty() {
+            if let Some(start) = remaining.find("_BBB") {
+                let (before, rest) = remaining.split_at(start);
+                if !before.is_empty() {
+                    para = para.add_run(Run::new().add_text(before));
+                }
+
+                // On coupe l'ouverture "_BBB" (4 caractères)
+                let rest = &rest[4..];
+
+                if let Some(end) = rest.find("BBB_") {
+                    let bold_text = &rest[..end]; // texte entre _BBB et BBB_
+                    para = para.add_run(Run::new().add_text(bold_text).bold());
+
+                    // on avance après la balise fermante "BBB_" (4 caractères)
+                    remaining = &rest[end + 4..];
+                    continue;
+                } else { break; }
+            } else if let Some(start) = remaining.find("III_") {
+                let (before, rest) = remaining.split_at(start);
+                if !before.is_empty() {
+                    para = para.add_run(Run::new().add_text(before));
+                }
+                if let Some(end) = rest[4..].find("III_") {
+                    let italic_text = &rest[4..4 + end];
+                    para = para.add_run(Run::new().add_text(italic_text).italic());
+                    remaining = &rest[5 + end + 4..];
+                    continue;
+                } else { break; }
+            } else if let Some(start) = remaining.find("###") {
+                let (before, rest) = remaining.split_at(start);
+                if !before.is_empty() {
+                    para = para.add_run(Run::new().add_text(before));
+                }
+                if let Some(end) = rest[3..].find("###") {
+                    let sup_text = &rest[3..3 + end];
+                    // Texte en exposant avec RunProperties
+                    let sup_run = Run::new()
+                        .add_text(sup_text);
+                       // .property(RunProperties::new().vert_align(VerticalAlignType::Superscript));
+                    para = para.add_run(sup_run);
+                    remaining = &rest[3 + end + 3..];
+                    continue;
+                } else { break; }
+            } else {
+                para = para.add_run(Run::new().add_text(remaining));
+                break;
+            }
+        }
+
+        para
+    }
+
+    let table = Table::new(vec![TableRow::new(vec![TableCell::new()
+                                                       .add_paragraph(
+                                                           parse_paragraph(content)
+                                                               .size(FONT_SIZE_NORMAL * 2)
+                                                               .fonts(RunFonts::new().ascii(FONT).hi_ansi(FONT).cs(FONT))
+                                                               .align(AlignmentType::Left),
+                                                       ),
     ])])
         .width(5000, WidthType::Pct)
-        .margins(
-            TableCellMargins::new()
-                .margin_top(100, WidthType::Dxa)); // A ajouter à chaque content
+        .margins(TableCellMargins::new().margin_top(100, WidthType::Dxa));
+
     Ok(table)
 }
