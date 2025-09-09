@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use reqwest::{Client, Response};
+use reqwest::{Client, Error, Response};
 use base64::engine::general_purpose;
 use base64::Engine;
 use crate::api::LameMajeureDetail;
@@ -9,6 +9,7 @@ pub struct ThemeNumerologie {
     pub numerologie: Numerologie,
     pub token: String,
 }
+pub const SW_DEBUG: bool = false;
 
 impl ThemeNumerologie {
     pub fn new(numerologie: Numerologie, token: String) -> Self {
@@ -18,6 +19,7 @@ impl ThemeNumerologie {
             token,
         }
     }
+
 
     // Personalité profonde
     pub async fn get_cai(&self) ->  Result<(&i32, String), reqwest::Error> {
@@ -30,17 +32,21 @@ impl ThemeNumerologie {
                 .send()
                 .await?
                 .error_for_status()?;
-        /* DEBUG
-        let body: String = resp.text().await?;
-        //println!("{}", body);
-        let lame_majeure_detail: Result<LameMajeureDetail, serde_json::Error> = serde_json::from_str(&body);
-        match lame_majeure_detail {
-            Ok(detail) => println!("Deserialized: {:?}", detail),
-            Err(e) => println!("Erreur de désérialisation: {}", e),
-        } */
-        let lame_majeure_detail: LameMajeureDetail = resp.json().await?;
-        let cai = lame_majeure_detail.numerologie_caractere_intime;
-        Ok((&self.numerologie.interpretation_cai, cai.unwrap().html_body_one_note_raw))
+        if SW_DEBUG {
+            let body: String = resp.text().await?;
+            //println!("{}", body);
+            let lame_majeure_detail: Result<LameMajeureDetail, serde_json::Error> = serde_json::from_str(&body);
+            match lame_majeure_detail {
+                Ok(detail) => println!("Deserialized: {:?}", detail),
+                Err(e) => println!("Erreur de désérialisation: {}", e),
+            }
+            eprintln!("Debug");
+            std::process::exit(1);
+        } else {
+            let lame_majeure_detail: LameMajeureDetail = resp.json().await?;
+            let cai = lame_majeure_detail.numerologie_caractere_intime;
+            Ok((&self.numerologie.interpretation_cai, cai.unwrap().html_body_one_note_raw))
+        }
     }
 }
 
