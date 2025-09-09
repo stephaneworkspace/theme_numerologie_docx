@@ -15,6 +15,7 @@ base64 = "0.22.1"
 image = "0.24.9"
 error = "0.1.9"
 log = "0.4.28"
+chrono = { version = "0.4.42", features = ["serde"] }
 
 [lib]
 name = "theme_numerologie_docx"

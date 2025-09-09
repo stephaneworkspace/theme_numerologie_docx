@@ -22,30 +22,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Token T: {:?}", token_t);
 
     let mut buf: Vec<u8> = Vec::new();
-    if let Some(token) = token_t {
-        let client = TNumerologieClient::new(token.to_string());
-        match client.get_index(1).await {
-            Ok(ok) => {
-                match general_purpose::STANDARD.decode(&ok.png_simple_b64) {
-                    Ok(decoded) => {
-                        buf = decoded;
-                    },
-                    Err(_) => {
-                        eprintln!("Erreur: base64 invalide pour png_simple_b64");
-                        std::process::exit(1);
+    if let Some(t_n) = token_n {
+        if let Some(t_t) = token_t {
+            let client = TNumerologieClient::new(t_n, t_t);
+            match client.get_index(1).await {
+                Ok(ok) => {
+                    match general_purpose::STANDARD.decode(&ok.numerologie.png_simple_b64) {
+                        Ok(decoded) => {
+                            buf = decoded;
+                            println!("{:?}", &ok.get_pp().await.ok());
+                        },
+                        Err(_) => {
+                            eprintln!("Erreur: base64 invalide pour png_simple_b64");
+                            std::process::exit(1);
+                        }
                     }
-                }
-            },
-            Err(e) => {
-                eprintln!("Erreur de traitement: {}", e);
-                std::process::exit(1);
-            },
+                },
+                Err(e) => {
+                    eprintln!("Erreur de traitement: {}", e);
+                    std::process::exit(1);
+                },
+            }
+        } else {
+            eprintln!("Erreur: token_n vide");
+            std::process::exit(1);
         }
     } else {
         eprintln!("Erreur: token_t vide");
         std::process::exit(1);
     }
-    println!("{:?}", buf);
+    //println!("{:?}", buf);
 
     let width = ((720 as f64) * 192.0 * 38.7).round() as u32;
     let height = ((397 as f64) * 192.0 * 38.7).round() as u32;

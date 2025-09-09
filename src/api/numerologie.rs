@@ -2,6 +2,47 @@ use serde::Deserialize;
 use reqwest::{Client, Response};
 use base64::engine::general_purpose;
 use base64::Engine;
+use crate::api::LameMajeureDetail;
+
+pub struct ThemeNumerologie {
+    base_url: String,
+    pub numerologie: Numerologie,
+    pub token: String,
+}
+
+impl ThemeNumerologie {
+    pub fn new(numerologie: Numerologie, token: String) -> Self {
+        Self {
+            base_url: "https://numerologie.bressani.dev:1122".to_string(),
+            numerologie,
+            token,
+        }
+    }
+
+    // Personalité profonde
+    pub async fn get_pp(&self) ->  Result<(&i32, String), reqwest::Error> {
+        let url = format!("{}/api/lame_majeures/{}", self.base_url, 2);
+        let client = Client::new();
+        let resp: Response =
+            client
+                .get(&url)
+                .bearer_auth(&self.token)
+                .send()
+                .await?
+                .error_for_status()?;
+        /* DEBUG
+        let body: String = resp.text().await?;
+        //println!("{}", body);
+        let lame_majeure_detail: Result<LameMajeureDetail, serde_json::Error> = serde_json::from_str(&body);
+        match lame_majeure_detail {
+            Ok(detail) => println!("Deserialized: {:?}", detail),
+            Err(e) => println!("Erreur de désérialisation: {}", e),
+        } */
+        let lame_majeure_detail: LameMajeureDetail = resp.json().await?;
+        let note_de_cours = lame_majeure_detail.numerologie_note_de_cours;
+        Ok((&self.numerologie.interpretation_ppr, note_de_cours[0].html_body_one_note_raw.clone()))
+    }
+}
 
 #[derive(Debug, Deserialize)]
 pub struct Numerologie {
@@ -34,49 +75,33 @@ pub struct Numerologie {
     pub interpretation_01_rha_i: String,
 }
 
+#[derive(Clone)]
 pub struct TNumerologieClient {
     base_url: String,
-    token: String,
+    token_n: String,
+    token_t: String,
 }
 
 impl TNumerologieClient {
-    pub fn new(token: String) -> Self {
+    pub fn new(token_n: String, token_t: String) -> Self {
         Self {
             base_url: "https://t.bressani.dev:1178".to_string(),
-            token,
+            token_n,
+            token_t,
         }
     }
 
-    pub async fn get_index(&self, id: i32) -> Result<Numerologie, reqwest::Error> {
+    pub async fn get_index(&self, id: i32) -> Result<ThemeNumerologie, reqwest::Error> {
         let url = format!("{}/api/numerologie/{}", self.base_url, id);
         let client = Client::new();
-        let resp: Option<Response> = client
+        let resp: Response = client
             .get(&url)
-            //.header("Accept", "application/json")
-            .bearer_auth(&self.token)
+            .bearer_auth(&self.token_t)
             .send()
-            .await
-            .ok(); // TODO catch l'erreur 200 error_for_status()?
-        //let body = resp.unwrap().text().await?;
-        //println!("{}", body);
-        let numerologie: Numerologie = resp.unwrap().json().await?;
-        Ok(numerologie)
+            .await?
+            .error_for_status()?; // transforme les réponses 4xx/5xx en erreur
+
+        let numerologie: Numerologie = resp.json().await?;
+        Ok(ThemeNumerologie::new(numerologie, self.token_n.as_str().to_string()))
     }
 }
-
-// Example function showing how to decode png_simple_b64 and use it
-// This is not part of the original file, but the instructions imply modifying main.rs accordingly.
-// The following code snippet should be integrated in main.rs or wherever appropriate:
-
-/*
-use some_image_display_crate::Pic; // Hypothetical import
-
-fn process_numerologie_image(numerologie: &Numerologie, width: u32, height: u32) -> Result<Pic, String> {
-    let buf = general_purpose::STANDARD.decode(&numerologie.png_simple_b64)
-        .map_err(|e| format!("Erreur lors du décodage Base64 de png_simple_b64: {}", e))?;
-    // let pic = Pic::new(&buf.as_slice()).size(width, height);
-    // return Ok(pic);
-}
-*/
-
-// The commented out code for reading image from disk should be removed from main.rs as per instructions.
