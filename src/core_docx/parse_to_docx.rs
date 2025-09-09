@@ -38,15 +38,12 @@ pub fn parse_paragraph(text: &str) -> Paragraph {
                 if let Some(end) = rest.find("BBB_") {
                     let mut bold_text = rest[..end].to_string();
                     let mut addSpace = false;
-                    // regarde si le texte qui suit le marqueur commence par " ,"
                     if rest[end..].starts_with(" ,") {
-                        // supprime l'espace avant la virgule et inclut la virgule dans le Run
                         bold_text.push(',');
                         remaining = &rest[end + 2..]; // saute l'espace + virgule
                     } else {
                         if let Some(next_char) = rest[end + 4..].chars().next() {
                             if !next_char.is_whitespace() && next_char != ',' {
-                                // ajoute un espace “neutre” pour Word
                                 addSpace = true;
                             }
                         }
