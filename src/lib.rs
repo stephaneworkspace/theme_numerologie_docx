@@ -4,6 +4,8 @@ mod core_docx;
 mod api;
 mod password;
 
+pub mod html_tools;
+
 // mod tools;
 use docx_rs::*;
 use crate::api::{MultiAuth, TNumerologieClient};
@@ -18,7 +20,7 @@ use std::fs;
 use std::path::PathBuf;
 
 #[no_mangle]
-pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char, nom: *const libc::c_char, date: *const libc::c_char) -> *const libc::c_char {
+pub extern "C" fn theme(password: *const libc::c_char, _: *const libc::c_char, nom: *const libc::c_char, date: *const libc::c_char) -> *const libc::c_char {
     use std::ffi::CStr;
     unsafe {
         let name = CStr::from_ptr(nom).to_str().unwrap_or("invalid");
@@ -32,11 +34,11 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
         Ok(s) => s,
         Err(_) => return std::ptr::null_mut(),
     };
-    let c_str = unsafe { CStr::from_ptr(png) };
-    let png_str = match c_str.to_str() {
-        Ok(s) => s,
-        Err(_) => return std::ptr::null_mut(),
-    };
+    // let c_str = unsafe { CStr::from_ptr(png) };
+    //let png_str = match c_str.to_str() {
+    //    Ok(s) => s,
+    //    Err(_) => return std::ptr::null_mut(),
+    //};
     let c_str = unsafe { CStr::from_ptr(nom) };
     let nom_str = match c_str.to_str() {
         Ok(s) => s,
@@ -62,10 +64,10 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
         let (token_n, token_t) = auth.get_token();
 
         let mut buf: Vec<u8> = Vec::new();
-        let client = TNumerologieClient::new(token_t.as_ref().cloned().unwrap());
+        let client = TNumerologieClient::new(token_n.as_ref().cloned().unwrap(), token_t.as_ref().cloned().unwrap());
         match client.get_index(1).await {
             Ok(ok) => {
-                match general_purpose::STANDARD.decode(&ok.png_simple_b64) {
+                match general_purpose::STANDARD.decode(&ok.numerologie.png_simple_b64) {
                     Ok(decoded) => {
                         buf = decoded;
                     },
@@ -79,8 +81,8 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
             },
         }
 
-        let width = ((720 as f64) * 192.0 * 38.7).round() as u32;
-        let height = ((397 as f64) * 192.0 * 38.7).round() as u32;
+        let width = ((720f64) * 192.0 * 38.7).round() as u32;
+        let height = ((397f64) * 192.0 * 38.7).round() as u32;
         let pic = Pic::new(&buf.as_slice()).size(width, height);
 
         // Créer un buffer avec Cursor
@@ -96,12 +98,12 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
                 add_run(Run::new()
                     .add_text("")))
             .add_table(core_docx::titre_2("Meilleur moyen pour se connecter à son intuition").unwrap())
-            .add_table(core_docx::content_2("Le meilleur moyen...").unwrap())
+            //.add_table(core_docx::content_2("Le meilleur moyen...").unwrap())
             .build()
             .pack(&mut buffer);
 
         if let Err(e) = docx_res {
-            error!("Erreur lors de la génération du docx: {}", e);
+            error!("Erreur lors de la génération du docx : {}", e);
             return Err(format!("Erreur docx: {}", e));
         }
 
@@ -117,7 +119,7 @@ pub extern "C" fn theme(password: *const libc::c_char, png: *const libc::c_char,
     let json_cstring = match result {
         Ok(json) => CString::new(json.to_string()).unwrap(),
         Err(msg) => {
-            eprintln!("Erreur durant l'exécution async: {}", msg);
+            eprintln!("Erreur durant l'exécution async : {}", msg);
             CString::new(format!("{{\"error\":\"{}\"}}", msg)).unwrap()
         }
     };

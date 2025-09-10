@@ -1,7 +1,9 @@
-mod core_docx;
+extern crate core;
+
+pub mod core_docx;
 mod api;
 mod password;
-mod html_tools;
+pub mod html_tools;
 
 use std::ffi::CString;
 // mod tools;
@@ -14,6 +16,7 @@ use base64::engine::general_purpose;
 use base64::Engine;
 use docx_rs::Pic;
 use crate::core_docx::{ColorEnum, NumerologieAspects};
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -34,11 +37,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut cai_aspects_b: Vec<String> = vec![];
     let mut cai_aspects_r: Vec<String> = vec![];
     let mut cai_bold_aspects: Vec<String> = vec![];
+    let mut cai_aspects: Vec<NumerologieAspects> = vec![];
     if let Some(t_n) = token_n {
         if let Some(t_t) = token_t {
             let client = TNumerologieClient::new(t_n, t_t);
             match client.get_index(43).await {
-                Ok(ok) => {
+                Ok(mut ok) => {
                     match general_purpose::STANDARD.decode(&ok.numerologie.png_simple_b64) {
                         Ok(decoded) => {
                             buf = decoded;
@@ -53,25 +57,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                         }
                                     })
                                     .collect();
-                                cai_bold_aspects = lame_majeur_detail.numerologie_aspects.as_slice()
-                                    .iter()
-                                    .filter(|x| {
-                                        x.sw_bold && x.nom.clone().is_some()
-                                    })
-                                    .map(|x| {
-                                        x.nom.clone().unwrap()
-                                    })
-                                    .collect();
                                 if let Some(cartouche) =  lame_majeur_detail.cartouche_grimaud {
                                     cai_cartouche = cartouche;
                                 }
                                 if let Some(text) = text {
-                                    let mut v: Vec<String> = Vec::new();
-                                    let mut vb: Vec<String> = Vec::new();
-                                    let mut vr: Vec<String> = Vec::new();
                                     (cai, _) = html_tools::extract_supers_and_bold_and_italic(&text.html_body_one_note_raw.as_str());
-                                    (cai_b, cai_aspects_b) = html_tools::extract_supers_and_bold_and_italic(&text.html_body_one_note_raw_b.as_str());
-                                    (cai_r, cai_aspects_r) = html_tools::extract_supers_and_bold_and_italic(&text.html_body_one_note_raw_r.as_str());
+                                    (cai_b, _) = html_tools::extract_supers_and_bold_and_italic(&text.html_body_one_note_raw_b.as_str());
+                                    (cai_r, _) = html_tools::extract_supers_and_bold_and_italic(&text.html_body_one_note_raw_r.as_str());
                                 }
                                 match ok.get_carte(carte.clone()).await {
                                     Ok(cai_carte_vu8) => {
@@ -82,6 +74,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                         std::process::exit(1);
                                     },
                                 }
+                                cai_aspects = ok.cai_aspects.as_slice().to_vec()
                             } else {
                                 println!("Aucun contenu disponible");
                             }
@@ -118,35 +111,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let height_cai = ((75 as f64) * 192.0 * 200.0).round() as u32;
     let pic_cai = Pic::new(&cai_carte.as_slice()).size(width_cai, height_cai);
 
-
-    let mut v_cai_aspects: Vec<NumerologieAspects> = cai_aspects_b.into_iter().map(|x| {
-        let mut find = false;
-        for y in cai_bold_aspects.as_slice().iter() {
-            if x == *y {
-                find = true;
-                break;
-            }
-        }
-        NumerologieAspects {
-            aspect: x,
-            color: ColorEnum::Bleu,
-            sw_bold: find,
-        }
-    }).collect();
-    v_cai_aspects.extend(
-        cai_aspects_r
-            .into_iter()
-            .map(|x| {
-                let sw_bold = cai_bold_aspects.iter().any(|y| x == *y);
-                NumerologieAspects {
-                    aspect: x,
-                    color: ColorEnum::Rouge,
-                    sw_bold,
-                }
-            })
-    );
-
-
     let footer =
         Footer::new().add_paragraph(Paragraph::new().add_run(Run::new())
             .add_page_num(PageNum::new()));
@@ -180,7 +144,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .add_text("")))
         .add_paragraph(Paragraph::new().add_run(Run::new().add_break(BreakType::Page)))
         .add_table(core_docx::titre_2(format!("Caractère intérieur - {}", cai_cartouche).as_str())?)
-        .add_table(core_docx::content_2_trois_etape(pic_cai, cai_mots_cles.as_slice(), cai.as_str(), cai_b.as_str(),cai_r.as_str(), v_cai_aspects.as_slice())?)
+        .add_table(core_docx::content_2_trois_etape(pic_cai, cai_mots_cles.as_slice(), cai.as_str(), cai_b.as_str(),cai_r.as_str(), cai_aspects.as_slice())?)
         .add_numbering(Numbering::new(2, 2))
         .build()
         .pack(file)?;

@@ -1,15 +1,35 @@
-use bytes::Bytes;
 use serde::Deserialize;
-use reqwest::{Client, Error, Response};
-use reqwest::header::ACCEPT;
+use reqwest::{Client, Response};
 use crate::api::{LameMajeureDetail, NumerologieCaractereIntime};
+use crate::core_docx::{ColorEnum, NumerologieAspects};
+use crate::html_tools::extract_supers_and_bold_and_italic;
 
 pub struct ThemeNumerologie {
     base_url: String,
     pub numerologie: Numerologie,
     pub token: String,
-    path_cartes: String
+    path_cartes: String,
+    pub cai_aspects: Vec<NumerologieAspects>,
 }
+
+pub enum TraitementNumerologie {
+    Cai,
+    Cae,
+    Int,
+    Coi,
+    Coe,
+    Nem,
+    Pex,
+    Ppr,
+    Rha,
+}
+
+struct ComposeAspect {
+    cai_aspects_b: Vec<String>,
+    cai_aspects_r: Vec<String>,
+    cai_bold_aspects: Vec<String>,
+}
+
 pub const SW_DEBUG: bool = false;
 
 impl ThemeNumerologie {
@@ -19,11 +39,12 @@ impl ThemeNumerologie {
             numerologie,
             token,
             path_cartes: "/Users/stephane/Code/rust/ref/theme_numerologie_docx/images/TAROT-GRIMAUD".to_string(), // TODO later
+            cai_aspects: vec![],
         }
     }
 
-    // Personalité profonde
-    pub async fn get_cai(&self, carte: u32) ->  Result<(&i32, LameMajeureDetail, Option<NumerologieCaractereIntime>), reqwest::Error> {
+    /// get_cai permet de charger les données Cai
+    pub async fn get_cai(&mut self, carte: u32) -> Result<(i32, LameMajeureDetail, Option<NumerologieCaractereIntime>), reqwest::Error> {
         let url = format!("{}/api/lame_majeures/{}", self.base_url, carte);
         let client = Client::new();
         let resp: Response =
@@ -38,15 +59,28 @@ impl ThemeNumerologie {
             //println!("{}", body);
             let lame_majeure_detail: Result<LameMajeureDetail, serde_json::Error> = serde_json::from_str(&body);
             match lame_majeure_detail {
-                Ok(detail) => println!("Deserialized: {:?}", detail),
-                Err(e) => println!("Erreur de désérialisation: {}", e),
+                Ok(detail) => println!("Deserialized : {:?}", detail),
+                Err(e) => println!("Erreur de désérialisation : {}", e),
             }
             eprintln!("Debug");
             std::process::exit(1);
         } else {
             let lame_majeure_detail: LameMajeureDetail = resp.json().await?;
             let cai = lame_majeure_detail.numerologie_caractere_intime.clone();
-            Ok((&self.numerologie.interpretation_cai, lame_majeure_detail, cai))
+            let html: String = cai
+                .as_ref() // convertit Option<T> en Option<&T>
+                .map(|c| c.html_body_one_note_raw.clone())
+                .unwrap_or_else(|| "".to_string());
+            let html_b: String = cai
+                .as_ref() // convertit Option<T> en Option<&T>
+                .map(|c| c.html_body_one_note_raw_b.clone())
+                .unwrap_or_else(|| "".to_string());
+            let html_r: String = cai
+                .as_ref() // convertit Option<T> en Option<&T>
+                .map(|c| c.html_body_one_note_raw_r.clone())
+                .unwrap_or_else(|| "".to_string());
+            self.compute_aspect(TraitementNumerologie::Cai, &lame_majeure_detail, html, html_b, html_r);
+            Ok((self.numerologie.interpretation_cai, lame_majeure_detail, cai))
         }
     }
 
@@ -55,22 +89,71 @@ impl ThemeNumerologie {
         let path = std::path::Path::new(&self.path_cartes).join(file_name);
         let data = tokio::fs::read(path).await?;
         Ok(data)
-        /* TOO SLOW
-        let url = format!("{}/api/cartes/{}", self.base_url, id);
-        let client = Client::new();
-        let resp: Response = client
-            .get(&url)
-            .header(ACCEPT, "image/jpg")
-            .query(&[("jeu", "GRIMAUD_C")])
-            .bearer_auth(&self.token)
-            .send()
-            .await?
-            .error_for_status()?; // transforme les réponses 4xx/5xx en erreur
-        Ok(resp.bytes().await?)*/
+    }
+
+    /// compute_aspect permet de préparer les champs d'aspects:
+    /// self.cai_aspects
+    /// et ainsi de suite... // TODO à faire
+    fn compute_aspect(&mut self, type_traitement: TraitementNumerologie, lame_majeur_detail: &LameMajeureDetail, _: String, html_b: String, html_r: String) {
+        let mut cai_aspects_b: Vec<String> = vec![];
+        let mut cai_aspects_r: Vec<String> = vec![];
+        let mut bold_aspects: Vec<String> = vec![];
+        bold_aspects = lame_majeur_detail.numerologie_aspects.as_slice()
+            .iter()
+            .filter(|x| {
+                x.sw_bold && x.nom.clone().is_some()
+            })
+            .map(|x| {
+                x.nom.clone().unwrap()
+            })
+            .collect();
+        // (_, _) = html_tools::extract_supers_and_bold_and_italic(&text.html_body_one_note_raw.as_str());
+        (_, cai_aspects_b) = extract_supers_and_bold_and_italic(html_b.as_str());
+        (_, cai_aspects_r) = extract_supers_and_bold_and_italic(html_r.as_str());
+        let mut traitement = vec![];
+        traitement = cai_aspects_b.into_iter().map(|x| {
+            let mut find = false;
+            for y in bold_aspects.as_slice().iter() {
+                if x == *y {
+                    find = true;
+                    break;
+                }
+            }
+            NumerologieAspects {
+                aspect: x,
+                color: ColorEnum::Bleu,
+                sw_bold: find,
+            }
+        }).collect();
+        traitement.extend(
+            cai_aspects_r
+                .into_iter()
+                .map(|x| {
+                    let sw_bold = bold_aspects.iter().any(|y| x == *y);
+                    NumerologieAspects {
+                        aspect: x,
+                        color: ColorEnum::Rouge,
+                        sw_bold,
+                    }
+                })
+        );
+        match type_traitement {
+            TraitementNumerologie::Cai => {
+                self.cai_aspects = traitement
+            }
+            TraitementNumerologie::Cae => {}
+            TraitementNumerologie::Int => {}
+            TraitementNumerologie::Coi => {}
+            TraitementNumerologie::Coe => {}
+            TraitementNumerologie::Nem => {}
+            TraitementNumerologie::Pex => {}
+            TraitementNumerologie::Ppr => {}
+            TraitementNumerologie::Rha => {}
+        }
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Numerologie {
     pub id: i32,
     pub numerologie_type: i32,
@@ -117,7 +200,7 @@ impl TNumerologieClient {
         }
     }
 
-    pub async fn get_index(&self, id: i32) -> Result<ThemeNumerologie, reqwest::Error> {
+    pub async fn get_index(&self, id: u32) -> Result<ThemeNumerologie, reqwest::Error> {
         let url = format!("{}/api/numerologie/{}", self.base_url, id);
         let client = Client::new();
         let resp: Response = client
@@ -130,4 +213,5 @@ impl TNumerologieClient {
         let numerologie: Numerologie = resp.json().await?;
         Ok(ThemeNumerologie::new(numerologie, self.token_n.as_str().to_string()))
     }
+
 }

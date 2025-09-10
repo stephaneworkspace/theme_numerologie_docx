@@ -1,5 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
+use crate::api::numerologie::ThemeNumerologie;
+use crate::core_docx::{ColorEnum, NumerologieAspects};
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct LameMajeuresDivination {
