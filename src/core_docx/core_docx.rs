@@ -137,7 +137,7 @@ pub fn content_2(content: &str, color: ColorEnum) -> Result<Table, Box<dyn std::
     Ok(table)
 }
 
-pub fn content_2_trois_etape(content: &str, content_b: &str, content_r: &str) -> Result<Table, Box<dyn std::error::Error>> {
+pub fn content_2_trois_etape(pic: Pic, content: &str, content_b: &str, content_r: &str) -> Result<Table, Box<dyn std::error::Error>> {
     let p_noir = parse_paragraph(content, ColorEnum::Noir)
         .size(FONT_SIZE_NORMAL * 2)
         .fonts(RunFonts::new().ascii(FONT).hi_ansi(FONT).cs(FONT))
@@ -155,6 +155,10 @@ pub fn content_2_trois_etape(content: &str, content_b: &str, content_r: &str) ->
 
 
     let table = Table::new(vec![TableRow::new(vec![TableCell::new()
+                                                       .add_paragraph(Paragraph::new().add_run(
+                                                           Run::new()
+                                                               .add_image(pic)
+                                                       ).align(AlignmentType::Left))
                                                        .add_paragraph(
                                                            p_noir)
                                                        .add_paragraph(
@@ -162,28 +166,6 @@ pub fn content_2_trois_etape(content: &str, content_b: &str, content_r: &str) ->
                                                            )
                                                        .add_paragraph(
                                                            p_rouge
-                                                           /*
-                                                           parse_paragraph(content, ColorEnum::Noir)
-                                                               .size(FONT_SIZE_NORMAL * 2)
-                                                               .fonts(RunFonts::new()
-                                                                   .ascii(FONT)
-                                                                   .hi_ansi(FONT)
-                                                                   .cs(FONT))
-                                                               .align(AlignmentType::Left),
-                                                           parse_paragraph(content_b, ColorEnum::Bleu)
-                                                               .size(FONT_SIZE_NORMAL * 2)
-                                                               .fonts(RunFonts::new()
-                                                                   .ascii(FONT)
-                                                                   .hi_ansi(FONT)
-                                                                   .cs(FONT))
-                                                               .align(AlignmentType::Left),
-                                                           parse_paragraph(content_r, ColorEnum::Rouge)
-                                                               .size(FONT_SIZE_NORMAL * 2)
-                                                               .fonts(RunFonts::new()
-                                                                   .ascii(FONT)
-                                                                   .hi_ansi(FONT)
-                                                                   .cs(FONT))
-                                                               .align(AlignmentType::Left),*/
                                                        ),
     ])])
         .width(5000, WidthType::Pct)

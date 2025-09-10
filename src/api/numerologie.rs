@@ -1,13 +1,14 @@
+use bytes::Bytes;
 use serde::Deserialize;
 use reqwest::{Client, Error, Response};
-use base64::engine::general_purpose;
-use base64::Engine;
+use reqwest::header::ACCEPT;
 use crate::api::{LameMajeureDetail, NumerologieCaractereIntime};
 
 pub struct ThemeNumerologie {
     base_url: String,
     pub numerologie: Numerologie,
     pub token: String,
+    path_cartes: String
 }
 pub const SW_DEBUG: bool = false;
 
@@ -17,6 +18,7 @@ impl ThemeNumerologie {
             base_url: "https://numerologie.bressani.dev:1122".to_string(),
             numerologie,
             token,
+            path_cartes: "/Users/stephane/Code/rust/ref/theme_numerologie_docx/images/GRIMAUDC".to_string() // TODO Later
         }
     }
 
@@ -47,6 +49,25 @@ impl ThemeNumerologie {
             let cai = lame_majeure_detail.numerologie_caractere_intime;
             Ok((&self.numerologie.interpretation_cai, cai))
         }
+    }
+
+    pub async fn get_carte(&self, id: i32) -> Result<Vec<u8>, std::io::Error> {
+        let file_name = format!("{}.jpg", id);
+        let path = std::path::Path::new(&self.path_cartes).join(file_name);
+        let data = tokio::fs::read(path).await?;
+        Ok(data)
+        /* TOO SLOW
+        let url = format!("{}/api/cartes/{}", self.base_url, id);
+        let client = Client::new();
+        let resp: Response = client
+            .get(&url)
+            .header(ACCEPT, "image/jpg")
+            .query(&[("jeu", "GRIMAUD_C")])
+            .bearer_auth(&self.token)
+            .send()
+            .await?
+            .error_for_status()?; // transforme les réponses 4xx/5xx en erreur
+        Ok(resp.bytes().await?)*/
     }
 }
 
