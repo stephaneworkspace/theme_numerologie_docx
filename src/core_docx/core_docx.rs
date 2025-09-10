@@ -154,20 +154,28 @@ pub fn content_2_trois_etape(pic: Pic, content: &str, content_b: &str, content_r
         .align(AlignmentType::Left);
 
 
-    let table = Table::new(vec![TableRow::new(vec![TableCell::new()
-                                                       .add_paragraph(Paragraph::new().add_run(
-                                                           Run::new()
-                                                               .add_image(pic)
-                                                       ).align(AlignmentType::Left))
-                                                       .add_paragraph(
-                                                           p_noir)
-                                                       .add_paragraph(
-                                                           p_bleu
-                                                           )
-                                                       .add_paragraph(
-                                                           p_rouge
-                                                       ),
-    ])])
+    let table = Table::new(vec![
+        TableRow::new(vec![
+            TableCell::new()
+                .add_table(
+                    Table::new(vec![
+                        TableRow::new(vec![
+                            TableCell::new()
+                                .add_paragraph(Paragraph::new().add_run(
+                                    Run::new()
+                                        .add_image(pic)
+                                ).align(AlignmentType::Center))
+                                .clear_all_border()
+                                .width(900, WidthType::Pct),
+                            TableCell::new()
+                                .add_paragraph(p_noir)
+                                .add_paragraph(p_bleu)
+                                .add_paragraph(p_rouge)
+                                .clear_all_border(),
+                ])]))
+        ]
+        )
+    ])
         .width(5000, WidthType::Pct)
         .margins(TableCellMargins::new().margin_top(100, WidthType::Dxa));
 

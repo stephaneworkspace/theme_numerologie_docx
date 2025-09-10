@@ -18,9 +18,10 @@ impl ThemeNumerologie {
             base_url: "https://numerologie.bressani.dev:1122".to_string(),
             numerologie,
             token,
-            path_cartes: "/Users/stephane/Code/rust/ref/theme_numerologie_docx/images/GRIMAUDC".to_string() // TODO Later
+            path_cartes: "/Users/stephane/Desktop/carte_retouché".to_string(),
         }
     }
+    ///Users/stephane/Code/rust/ref/theme_numerologie_docx/images/GRIMAUDC".to_string() // TODO Later
 
 
     // Personalité profonde
