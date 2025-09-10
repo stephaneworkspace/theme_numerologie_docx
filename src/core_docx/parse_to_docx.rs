@@ -1,17 +1,5 @@
-use docx_rs::{Color, Paragraph, Run, RunFonts, RunProperty, VertAlignType};
-use regex::bytes::Replacer;
+use docx_rs::{BreakType, Color, Paragraph, Run, RunFonts, RunProperty, VertAlignType};
 use crate::core_docx::core_docx::ColorEnum;
-//use crate::core_docx::RunPropertyExt;
-// VertAlignType, XMLElement};
-/*
-fn run_superscript(text: &str) -> Run {
-    Run::new()
-        .add_text(text)
-        .add_child(
-            RawXML::new(r#"<w:rPr><w:vertAlign w:val="superscript"/></w:rPr>"#)
-        )
-}*/
-
 
 fn make_run(text: &str, color: &ColorEnum) -> Run {
     Run::new()
@@ -22,6 +10,28 @@ fn make_run(text: &str, color: &ColorEnum) -> Run {
             .ascii(crate::core_docx::core_docx::FONT)
             .hi_ansi(crate::core_docx::core_docx::FONT)
             .cs(crate::core_docx::core_docx::FONT))
+}
+
+pub fn paragraph_mots_cle(mots_cle: &[(ColorEnum, String)]) -> Paragraph {
+    let mut p = Paragraph::new();
+    for (i, (color, mot_cle)) in mots_cle.iter().enumerate() {
+        if i > 0 {
+            p = p.add_run(
+                Run::new()
+                    .add_break(BreakType::TextWrapping)
+            );
+        }
+        p = p.add_run(Run::new()
+            .color(color.hex())
+            .add_text(mot_cle.to_uppercase())
+            .size(crate::core_docx::core_docx::FONT_SIZE_MOTS_CLES * 2)
+            .fonts(RunFonts::new()
+                .ascii(crate::core_docx::core_docx::FONT)
+                .hi_ansi(crate::core_docx::core_docx::FONT)
+                .cs(crate::core_docx::core_docx::FONT)))
+            .bold();
+    }
+    p
 }
 
 pub fn parse_paragraph(text: &str, color_enum: ColorEnum) -> Paragraph {
@@ -51,17 +61,17 @@ pub fn parse_paragraph(text: &str, color_enum: ColorEnum) -> Paragraph {
                 let rest = &remaining[4..];
                 if let Some(end) = rest.find("BBB_") {
                     let mut bold_text = rest[..end].to_string();
-                    let mut addSpace = false;
+                    let mut add_space = false;
                     if rest[end..].starts_with(" ,") {
                         bold_text.push(',');
                         remaining = &rest[end + 2..]; // saute l'espace + virgule
                     } else {
                         if let Some(next_char) = rest[end + 4..].chars().next() {
                             if !next_char.is_whitespace() && next_char != ',' {
-                                addSpace = true;
+                                add_space = true;
                             }
                         }
-                        if addSpace {
+                        if add_space {
                             bold_text.push('\u{00A0}');
                         }
                         remaining = &rest[end + 4..];

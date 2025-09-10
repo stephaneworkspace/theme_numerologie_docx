@@ -9,10 +9,11 @@ use std::fs::File;
 use std::io::Read;
 use docx_rs::*;
 use docx_rs::XMLElement::Num;
-use crate::api::{MultiAuth, TNumerologieClient};
+use crate::api::{MultiAuth, NumerologieMotCle, TNumerologieClient};
 use base64::engine::general_purpose;
 use base64::Engine;
 use docx_rs::Pic;
+use crate::core_docx::ColorEnum;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -28,6 +29,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut cai: String = String::new();
     let mut cai_b: String = String::new();
     let mut cai_r: String = String::new();
+    let mut cai_cartouche: String = String::new();
+    let mut mots_cles: Vec<(ColorEnum, String)> = vec![];
     if let Some(t_n) = token_n {
         if let Some(t_t) = token_t {
             let client = TNumerologieClient::new(t_n, t_t);
@@ -36,7 +39,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     match general_purpose::STANDARD.decode(&ok.numerologie.png_simple_b64) {
                         Ok(decoded) => {
                             buf = decoded;
-                            if let Some((carte, text)) = ok.get_cai().await.ok() {
+                            if let Some((carte, lame_majeur_detail, text)) = ok.get_cai().await.ok() {
+                                mots_cles = lame_majeur_detail.numerologie_mots_cle.as_slice()
+                                    .iter()
+                                    .map(|x| {
+                                        if (x.polarite == Some("+".to_string())) {
+                                            (ColorEnum::Bleu, x.mot_cle.clone())
+                                        } else {
+                                            (ColorEnum::Rouge, x.mot_cle.clone())
+                                        }
+                                    })
+                                    .collect();
+                                if let Some(cartouche) =  lame_majeur_detail.cartouche_grimaud {
+                                    cai_cartouche = cartouche;
+                                }
                                 if let Some(text) = text {
                                     cai = html_tools::extract_supers_and_bold_and_italic(&text.html_body_one_note_raw.as_str());
                                     cai_b = html_tools::extract_supers_and_bold_and_italic(&text.html_body_one_note_raw_b.as_str());
@@ -83,12 +99,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let path = std::path::Path::new("./output/examples/image_inline.docx");
     let file = File::create(path).unwrap();
 
-    let width_cai = ((40 as f64) * 192.0 * 100.0).round() as u32;
-    let height_cai = ((75 as f64) * 192.0 * 100.0).round() as u32;
+    let width_cai = ((40 as f64) * 192.0 * 200.0).round() as u32;
+    let height_cai = ((75 as f64) * 192.0 * 200.0).round() as u32;
     let pic_cai = Pic::new(&cai_carte.as_slice()).size(width_cai, height_cai);
 
-
+    let footer =
+        Footer::new().add_paragraph(Paragraph::new().add_run(Run::new())
+            .add_page_num(PageNum::new()));
     Docx::new()
+        .footer(footer)
         .add_table(core_docx::titre_1("Numérologie")?)
         .add_paragraph(Paragraph::new().
             add_run(Run::new()
@@ -98,8 +117,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_paragraph(Paragraph::new().
             add_run(Run::new()
                 .add_text("")))
-        .add_table(core_docx::titre_2("Caractère intérieur")?)
-        .add_table(core_docx::content_2_trois_etape(pic_cai, cai.as_str(), cai_b.as_str(),cai_r.as_str())?)
+        .add_paragraph(Paragraph::new().add_run(Run::new().add_break(BreakType::Page)))
+        .add_table(core_docx::titre_2(format!("Caractère intérieur - {}", cai_cartouche).as_str())?)
+        .add_table(core_docx::content_2_trois_etape(pic_cai, mots_cles.as_slice(), cai.as_str(), cai_b.as_str(),cai_r.as_str())?)
         .build()
         .pack(file)?;
     Ok(())

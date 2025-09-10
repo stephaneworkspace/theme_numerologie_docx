@@ -18,14 +18,14 @@ impl ThemeNumerologie {
             base_url: "https://numerologie.bressani.dev:1122".to_string(),
             numerologie,
             token,
-            path_cartes: "/Users/stephane/Desktop/carte_retouché".to_string(),
+            path_cartes: "/Users/stephane/Code/rust/ref/theme_numerologie_docx/images/TAROT-GRIMAUD".to_string(),
         }
     }
     ///Users/stephane/Code/rust/ref/theme_numerologie_docx/images/GRIMAUDC".to_string() // TODO Later
 
 
     // Personalité profonde
-    pub async fn get_cai(&self) ->  Result<(&i32, Option<NumerologieCaractereIntime>), reqwest::Error> {
+    pub async fn get_cai(&self) ->  Result<(&i32, LameMajeureDetail, Option<NumerologieCaractereIntime>), reqwest::Error> {
         let url = format!("{}/api/lame_majeures/{}", self.base_url, 2);
         let client = Client::new();
         let resp: Response =
@@ -47,8 +47,8 @@ impl ThemeNumerologie {
             std::process::exit(1);
         } else {
             let lame_majeure_detail: LameMajeureDetail = resp.json().await?;
-            let cai = lame_majeure_detail.numerologie_caractere_intime;
-            Ok((&self.numerologie.interpretation_cai, cai))
+            let cai = lame_majeure_detail.numerologie_caractere_intime.clone();
+            Ok((&self.numerologie.interpretation_cai, lame_majeure_detail, cai))
         }
     }
 
