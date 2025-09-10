@@ -25,8 +25,8 @@ impl ThemeNumerologie {
 
 
     // Personalité profonde
-    pub async fn get_cai(&self) ->  Result<(&i32, LameMajeureDetail, Option<NumerologieCaractereIntime>), reqwest::Error> {
-        let url = format!("{}/api/lame_majeures/{}", self.base_url, 2);
+    pub async fn get_cai(&self, carte: u32) ->  Result<(&i32, LameMajeureDetail, Option<NumerologieCaractereIntime>), reqwest::Error> {
+        let url = format!("{}/api/lame_majeures/{}", self.base_url, carte);
         let client = Client::new();
         let resp: Response =
             client

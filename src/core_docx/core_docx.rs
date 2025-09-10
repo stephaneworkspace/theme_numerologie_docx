@@ -1,6 +1,6 @@
 use docx_rs::*;
 use docx_rs::RunFonts;
-use crate::core_docx::parse_to_docx::{paragraph_mots_cle, parse_paragraph};
+use crate::core_docx::parse_to_docx::{paragraphs_mots_cle, parse_paragraph};
 
 pub const FONT_SIZE_TITRE_1: usize = 18;
 pub const FONT_SIZE_TITRE_2: usize = 11;
@@ -137,8 +137,7 @@ pub fn content_2(content: &str, color: ColorEnum) -> Result<Table, Box<dyn std::
 }
 
 pub fn content_2_trois_etape(pic: Pic, mots_cle: &[(ColorEnum, String)], content: &str, content_b: &str, content_r: &str) -> Result<Table, Box<dyn std::error::Error>> {
-    let p_mot_cles= paragraph_mots_cle(mots_cle)
-        .bold();
+    let p_mot_cles= paragraphs_mots_cle(mots_cle);
     let p_noir = parse_paragraph(content, ColorEnum::Noir)
         .align(AlignmentType::Left);
 
@@ -150,23 +149,24 @@ pub fn content_2_trois_etape(pic: Pic, mots_cle: &[(ColorEnum, String)], content
 
     let empty = "";
 
+    let mut tc = TableCell::new();
+    tc = tc.add_paragraph(Paragraph::new().add_run(
+        Run::new()
+            .add_image(pic)
+    )
+        .align(AlignmentType::Left)
+    ).clear_all_border().width(2600, WidthType::Dxa);
+    for x in p_mot_cles {
+        tc = tc.add_paragraph(x);
+    }
+
     let table = Table::new(vec![
         TableRow::new(vec![
             TableCell::new()
                 .add_table(
                     Table::new(vec![
                         TableRow::new(vec![
-                            TableCell::new()
-                                .add_paragraph(Paragraph::new().add_run(
-                                    Run::new()
-                                        .add_image(pic)
-                                )
-                                    .align(AlignmentType::Left)
-                                )
-                                .clear_all_border()
-                                .width(2600, WidthType::Dxa)
-                                .add_paragraph(p_mot_cles)
-                            ,
+                            tc,
                             TableCell::new()
                                 .add_paragraph(p_noir)
                                 .add_paragraph(Paragraph::new().add_run(Run::new().add_text(empty)))

@@ -1,4 +1,4 @@
-use docx_rs::{BreakType, Color, Paragraph, Run, RunFonts, RunProperty, VertAlignType};
+use docx_rs::{BreakType, Color, IndentLevel, NumberingId, Paragraph, Run, RunFonts, RunProperty, VertAlignType};
 use crate::core_docx::core_docx::ColorEnum;
 
 fn make_run(text: &str, color: &ColorEnum) -> Run {
@@ -12,27 +12,22 @@ fn make_run(text: &str, color: &ColorEnum) -> Run {
             .cs(crate::core_docx::core_docx::FONT))
 }
 
-pub fn paragraph_mots_cle(mots_cle: &[(ColorEnum, String)]) -> Paragraph {
-    let mut p = Paragraph::new();
-    for (i, (color, mot_cle)) in mots_cle.iter().enumerate() {
-        if i > 0 {
-            p = p.add_run(
-                Run::new()
-                    .add_break(BreakType::TextWrapping)
-            );
-        }
-        p = p.add_run(Run::new()
-            .color(color.hex())
-            .add_text(mot_cle.to_uppercase())
-            .size(crate::core_docx::core_docx::FONT_SIZE_MOTS_CLES * 2)
-            .fonts(RunFonts::new()
-                .ascii(crate::core_docx::core_docx::FONT)
-                .hi_ansi(crate::core_docx::core_docx::FONT)
-                .cs(crate::core_docx::core_docx::FONT)))
-            .bold();
-    }
-    p
+pub fn paragraphs_mots_cle(mots_cle: &[(ColorEnum, String)]) -> Vec<Paragraph> {
+    mots_cle.iter().map(|(color, mot_cle)| {
+        Paragraph::new()
+            .add_run(Run::new()
+                .color(color.hex())
+                .add_text(mot_cle.to_uppercase())
+                .size(crate::core_docx::core_docx::FONT_SIZE_MOTS_CLES * 2)
+                .fonts(RunFonts::new()
+                    .ascii(crate::core_docx::core_docx::FONT)
+                    .hi_ansi(crate::core_docx::core_docx::FONT)
+                    .cs(crate::core_docx::core_docx::FONT)))
+            .bold()
+            .numbering(NumberingId::new(2), IndentLevel::new(0))
+    }).collect()
 }
+
 
 pub fn parse_paragraph(text: &str, color_enum: ColorEnum) -> Paragraph {
     let mut para = Paragraph::new();
@@ -119,7 +114,6 @@ pub fn parse_paragraph(text: &str, color_enum: ColorEnum) -> Paragraph {
             break;
         } else {
             para = para.add_run(make_run(remaining, &color_enum));
-            break;
             break;
         }
     }

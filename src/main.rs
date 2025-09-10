@@ -39,7 +39,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     match general_purpose::STANDARD.decode(&ok.numerologie.png_simple_b64) {
                         Ok(decoded) => {
                             buf = decoded;
-                            if let Some((carte, lame_majeur_detail, text)) = ok.get_cai().await.ok() {
+                            if let Some((carte, lame_majeur_detail, text)) = ok.get_cai(ok.numerologie.interpretation_cai.clone() as u32).await.ok() {
                                 mots_cles = lame_majeur_detail.numerologie_mots_cle.as_slice()
                                     .iter()
                                     .map(|x| {
@@ -58,7 +58,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     cai_b = html_tools::extract_supers_and_bold_and_italic(&text.html_body_one_note_raw_b.as_str());
                                     cai_r = html_tools::extract_supers_and_bold_and_italic(&text.html_body_one_note_raw_r.as_str());
                                 }
-                                match ok.get_carte(*carte).await {
+                                match ok.get_carte(carte.clone()).await {
                                     Ok(cai_carte_vu8) => {
                                         cai_carte = cai_carte_vu8;
                                     },
@@ -108,6 +108,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .add_page_num(PageNum::new()));
     Docx::new()
         .footer(footer)
+        .add_abstract_numbering(
+            AbstractNumbering::new(2).add_level(
+                Level::new(
+                    0,
+                    Start::new(1),
+                    NumberFormat::new("bullet"),
+                    LevelText::new("•"),
+                    LevelJc::new("left"),
+                ).spacing(-74)                .indent(
+                    Some(300),
+                    Some(SpecialIndentType::Hanging(320)),
+                    None,
+                    None,
+                ),
+            ),
+        )
+        .add_numbering(Numbering::new(2, 2))
         .add_table(core_docx::titre_1("Numérologie")?)
         .add_paragraph(Paragraph::new().
             add_run(Run::new()
@@ -120,6 +137,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_paragraph(Paragraph::new().add_run(Run::new().add_break(BreakType::Page)))
         .add_table(core_docx::titre_2(format!("Caractère intérieur - {}", cai_cartouche).as_str())?)
         .add_table(core_docx::content_2_trois_etape(pic_cai, mots_cles.as_slice(), cai.as_str(), cai_b.as_str(),cai_r.as_str())?)
+        .add_numbering(Numbering::new(2, 2))
         .build()
         .pack(file)?;
     Ok(())
