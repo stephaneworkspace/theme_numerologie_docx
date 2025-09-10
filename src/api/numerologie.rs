@@ -18,11 +18,9 @@ impl ThemeNumerologie {
             base_url: "https://numerologie.bressani.dev:1122".to_string(),
             numerologie,
             token,
-            path_cartes: "/Users/stephane/Code/rust/ref/theme_numerologie_docx/images/TAROT-GRIMAUD".to_string(),
+            path_cartes: "/Users/stephane/Code/rust/ref/theme_numerologie_docx/images/TAROT-GRIMAUD".to_string(), // TODO later
         }
     }
-    ///Users/stephane/Code/rust/ref/theme_numerologie_docx/images/GRIMAUDC".to_string() // TODO Later
-
 
     // Personalité profonde
     pub async fn get_cai(&self, carte: u32) ->  Result<(&i32, LameMajeureDetail, Option<NumerologieCaractereIntime>), reqwest::Error> {

@@ -1,3 +1,5 @@
+extern crate core;
+
 mod core_docx;
 mod api;
 mod password;

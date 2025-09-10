@@ -15,7 +15,8 @@ pub fn clean_html(html: &String) -> String {
     plain_text.replace("\n", " ").replace("\r", " ").split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
-pub fn extract_supers_and_bold_and_italic(html: &str) -> String {
+pub fn extract_supers_and_bold_and_italic(html: &str) -> (String, Vec<String>) {
+    let mut vec: Vec<String> = vec![];
     let document = Html::parse_fragment(html);
 
     // Sélecteurs pour les différents styles
@@ -34,6 +35,7 @@ pub fn extract_supers_and_bold_and_italic(html: &str) -> String {
                 let replacement = format!("###{}###", text);
                 // remplace le span entier par le texte entouré
                 result = result.replace(&el.html(), &replacement);
+                vec.push(replacement);
             }
         }
     }
@@ -78,6 +80,19 @@ pub fn extract_supers_and_bold_and_italic(html: &str) -> String {
     let re_tags = Regex::new(r"<[^>]+>").unwrap();
     let cleaned = re_tags.replace_all(&result, "").to_string();
 
+    // Clean vector
+    vec = vec
+        .into_iter()
+        .flat_map(|x| {
+            x.replace("###(", "")
+                .replace(")###", "")
+                .replace(",","")
+                .split_whitespace()
+                .map(|s| s.to_string())
+                .collect::<Vec<String>>()
+        })
+        .collect();
+
     // Normalisation des espaces
-    cleaned.split_whitespace().collect::<Vec<_>>().join(" ")
+    (cleaned.split_whitespace().collect::<Vec<_>>().join(" "), vec)
 }

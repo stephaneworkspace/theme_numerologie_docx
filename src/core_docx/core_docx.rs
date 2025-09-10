@@ -1,6 +1,6 @@
 use docx_rs::*;
 use docx_rs::RunFonts;
-use crate::core_docx::parse_to_docx::{paragraphs_mots_cle, parse_paragraph};
+use crate::core_docx::parse_to_docx::{paragraphs_aspects, paragraphs_mots_cle, parse_paragraph};
 
 pub const FONT_SIZE_TITRE_1: usize = 18;
 pub const FONT_SIZE_TITRE_2: usize = 11;
@@ -9,6 +9,13 @@ pub const FONT_SIZE_NORMAL: usize = 9;
 pub const SHADE_TITRE_1: &str = "d1d0d1";
 pub const SHADE_TITRE_2: &str = "e7e7e7";
 pub const FONT: &str = "Calibri";
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct NumerologieAspects {
+    pub aspect: String,
+    pub color: ColorEnum,
+    pub sw_bold: bool,
+}
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum ColorEnum {
@@ -136,8 +143,19 @@ pub fn content_2(content: &str, color: ColorEnum) -> Result<Table, Box<dyn std::
     Ok(table)
 }
 
-pub fn content_2_trois_etape(pic: Pic, mots_cle: &[(ColorEnum, String)], content: &str, content_b: &str, content_r: &str) -> Result<Table, Box<dyn std::error::Error>> {
+pub fn content_2_trois_etape(pic: Pic,
+                             mots_cle: &[(ColorEnum, String)],
+                             content: &str,
+                             content_b: &str,
+                             content_r: &str,
+                             aspects: &[NumerologieAspects]) -> Result<Table, Box<dyn std::error::Error>> {
     let p_mot_cles= paragraphs_mots_cle(mots_cle);
+    let bbb: Vec<NumerologieAspects> = aspects.iter().filter(|x| x.color == ColorEnum::Bleu).map(|x| x.clone()).collect();
+    let rrr: Vec<NumerologieAspects> = aspects.iter().filter(|x| x.color == ColorEnum::Rouge).map(|x| x.clone()).collect();
+
+    let aspects_b  = paragraphs_aspects(bbb.as_slice());
+    let aspects_r = paragraphs_aspects(rrr.as_slice());
+
     let p_noir = parse_paragraph(content, ColorEnum::Noir)
         .align(AlignmentType::Left);
 
@@ -160,6 +178,28 @@ pub fn content_2_trois_etape(pic: Pic, mots_cle: &[(ColorEnum, String)], content
         tc = tc.add_paragraph(x);
     }
 
+    let mut tc_2 = TableCell::new();
+    tc_2 = tc_2
+        .add_paragraph(p_noir)
+        .add_paragraph(Paragraph::new().add_run(Run::new().add_text(empty)))
+        .add_paragraph(p_bleu)
+        .add_paragraph(Paragraph::new().add_run(Run::new().add_text(empty)))
+        .add_paragraph(p_rouge)
+        .clear_all_border()
+        .width(6000, WidthType::Dxa);
+    if aspects_b.len() > 0 {
+        tc_2 = tc_2.add_paragraph(Paragraph::new().add_run(Run::new().add_text(empty)));
+    }
+    for x in aspects_b {
+        tc_2 = tc_2.add_paragraph(x);
+    }
+    if aspects_r.len() > 0 {
+        tc_2 = tc_2.add_paragraph(Paragraph::new().add_run(Run::new().add_text(empty)));
+    }
+    for x in aspects_r {
+        tc_2 = tc_2.add_paragraph(x);
+    }
+
     let table = Table::new(vec![
         TableRow::new(vec![
             TableCell::new()
@@ -167,14 +207,7 @@ pub fn content_2_trois_etape(pic: Pic, mots_cle: &[(ColorEnum, String)], content
                     Table::new(vec![
                         TableRow::new(vec![
                             tc,
-                            TableCell::new()
-                                .add_paragraph(p_noir)
-                                .add_paragraph(Paragraph::new().add_run(Run::new().add_text(empty)))
-                                .add_paragraph(p_bleu)
-                                .add_paragraph(Paragraph::new().add_run(Run::new().add_text(empty)))
-                                .add_paragraph(p_rouge)
-                                .clear_all_border()
-                                .width(6000, WidthType::Dxa),
+                            tc_2,
                 ])]))
         ]
         )

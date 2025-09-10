@@ -1,5 +1,6 @@
 use docx_rs::{BreakType, Color, IndentLevel, NumberingId, Paragraph, Run, RunFonts, RunProperty, VertAlignType};
 use crate::core_docx::core_docx::ColorEnum;
+use crate::core_docx::NumerologieAspects;
 
 fn make_run(text: &str, color: &ColorEnum) -> Run {
     Run::new()
@@ -25,6 +26,20 @@ pub fn paragraphs_mots_cle(mots_cle: &[(ColorEnum, String)]) -> Vec<Paragraph> {
                     .cs(crate::core_docx::core_docx::FONT)))
             .bold()
             .numbering(NumberingId::new(2), IndentLevel::new(0))
+    }).collect()
+}
+
+pub fn paragraphs_aspects(aspect: &[(NumerologieAspects)]) -> Vec<Paragraph> {
+    aspect.iter().map(|a| {
+        Paragraph::new()
+            .add_run(Run::new()
+                .color(a.color.hex())
+                .add_text(if a.sw_bold { a.aspect.to_uppercase() } else { a.aspect.to_string()})
+                .size(crate::core_docx::core_docx::FONT_SIZE_NORMAL * 2)
+                .fonts(RunFonts::new()
+                    .ascii(crate::core_docx::core_docx::FONT)
+                    .hi_ansi(crate::core_docx::core_docx::FONT)
+                    .cs(crate::core_docx::core_docx::FONT)))
     }).collect()
 }
 

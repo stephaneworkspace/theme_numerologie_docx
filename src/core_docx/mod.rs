@@ -7,3 +7,4 @@ pub use core_docx::theme_2;
 pub use core_docx::content_2;
 pub use core_docx::content_2_trois_etape;
 pub use core_docx::ColorEnum;
+pub use core_docx::NumerologieAspects;
