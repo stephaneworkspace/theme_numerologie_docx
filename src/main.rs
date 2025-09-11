@@ -38,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         Ok(decoded) => {
                             buf = decoded;
                             if let Some(_) = &ok.get_all().await.ok() {
-                                numerologie = Some(ok.clone());
+                                numerologie = Some(ok);
                             } else {
                                 println!("Aucun contenu disponible"); // TODO later
                             }
