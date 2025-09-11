@@ -68,14 +68,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cai: String = numerologie.cai_html.html;
     let cai_b: String = numerologie.cai_html.html_b;
     let cai_r: String = numerologie.cai_html.html_r;
-    let cai_cartouche: String = numerologie.cai_lame.clone().unwrap().cartouche_grimaud.unwrap().to_string();
+    let cai_cartouche: String = numerologie.cai_lame.unwrap().cartouche_grimaud.unwrap().to_string();
     let cai_mots_cles: Vec<(ColorEnum, String)> = numerologie.cai_mots_cles.as_slice().to_vec();
     let cai_aspects: Vec<NumerologieAspects> = numerologie.cai_aspects.as_slice().to_vec();
     let ppr_carte: Vec<u8> = numerologie.ppr_carte.as_slice().to_vec();
     let ppr: String = numerologie.ppr_html.html;
     let ppr_b: String = numerologie.ppr_html.html_b;
     let ppr_r: String = numerologie.ppr_html.html_r;
-    let ppr_cartouche: String = numerologie.ppr_lame.clone().unwrap().cartouche_grimaud.unwrap().to_string();
+    let ppr_cartouche: String = numerologie.ppr_lame.unwrap().cartouche_grimaud.unwrap().to_string();
     let ppr_mots_cles: Vec<(ColorEnum, String)> = numerologie.ppr_mots_cles.as_slice().to_vec();
     let ppr_aspects: Vec<NumerologieAspects> = numerologie.ppr_aspects.as_slice().to_vec();
 
