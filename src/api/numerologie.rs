@@ -13,26 +13,34 @@ pub struct ThemeNumerologie {
     pub token: String,
     path_cartes: String,
     pub cai_lame: Option<LameMajeureDetail>,
+    pub cai_mots_cles: Vec<(ColorEnum, String)>,
     pub cai_html: HtmlNBR,
     pub cai_aspects: Vec<NumerologieAspects>,
     pub cae_lame: Option<LameMajeureDetail>,
+    pub cae_mots_cles: Vec<(ColorEnum, String)>,
     pub cae_html: HtmlNBR,
     pub cae_aspects: Vec<NumerologieAspects>,
     pub int_lame: Option<LameMajeureDetail>,
+    pub int_mots_cles: Vec<(ColorEnum, String)>,
     pub int_html: String,
     pub coi_lame: Option<LameMajeureDetail>,
+    pub coi_mots_cles: Vec<(ColorEnum, String)>,
     pub coi_html: HtmlNBR,
     pub coi_aspects: Vec<NumerologieAspects>,
     pub coe_lame: Option<LameMajeureDetail>,
+    pub coe_mots_cles: Vec<(ColorEnum, String)>,
     pub coe_html: HtmlNBR,
     pub coe_aspects: Vec<NumerologieAspects>,
     pub nem_lame: Option<LameMajeureDetail>,
+    pub nem_mots_cles: Vec<(ColorEnum, String)>,
     pub nem_html: HtmlNBR,
     pub nem_aspects: Vec<NumerologieAspects>,
     pub pex_lame: Option<LameMajeureDetail>,
+    pub pex_mots_cles: Vec<(ColorEnum, String)>,
     pub pex_html: HtmlNBR,
     pub pex_aspects: Vec<NumerologieAspects>,
     pub ppr_lame: Option<LameMajeureDetail>,
+    pub ppr_mots_cles: Vec<(ColorEnum, String)>,
     pub ppr_html: HtmlNBR,
     pub ppr_aspects: Vec<NumerologieAspects>,
 }
@@ -63,7 +71,7 @@ struct ComposeAspect {
     cai_bold_aspects: Vec<String>,
 }
 
-pub const SW_DEBUG: bool = false;
+// pub const SW_DEBUG: bool = false;
 
 impl ThemeNumerologie {
     pub fn new(numerologie: Numerologie, token: String) -> Self {
@@ -73,6 +81,7 @@ impl ThemeNumerologie {
             token,
             path_cartes: "/Users/stephane/Code/rust/ref/theme_numerologie_docx/images/TAROT-GRIMAUD".to_string(), // TODO later
             cai_lame: None,
+            cai_mots_cles: vec![],
             cai_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
@@ -80,6 +89,7 @@ impl ThemeNumerologie {
             },
             cai_aspects: vec![],
             cae_lame: None,
+            cae_mots_cles: vec![],
             cae_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
@@ -87,8 +97,10 @@ impl ThemeNumerologie {
             },
             cae_aspects: vec![],
             int_lame: None,
+            int_mots_cles: vec![],
             int_html: "".to_string(),
             coi_lame: None,
+            coi_mots_cles: vec![],
             coi_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
@@ -96,6 +108,7 @@ impl ThemeNumerologie {
             },
             coi_aspects: vec![],
             coe_lame: None,
+            coe_mots_cles: vec![],
             coe_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
@@ -103,6 +116,7 @@ impl ThemeNumerologie {
             },
             coe_aspects: vec![],
             nem_lame: None,
+            nem_mots_cles: vec![],
             nem_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
@@ -110,6 +124,7 @@ impl ThemeNumerologie {
             },
             nem_aspects: vec![],
             pex_lame: None,
+            pex_mots_cles: vec![],
             pex_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
@@ -117,6 +132,7 @@ impl ThemeNumerologie {
             },
             pex_aspects: vec![],
             ppr_lame: None,
+            ppr_mots_cles: vec![],
             ppr_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
@@ -241,6 +257,7 @@ impl ThemeNumerologie {
         let mut pex: Option<NumerologiePersonaliteExterieure> = None;
         let mut ppr: Option<NumerologiePersonaliteProfonde> = None;
         TraitementNumerologie::iter().for_each(|x| {
+            let mut mots_cles: Vec<(ColorEnum, String)> = vec![];
             let mut html: String = "".to_string();
             let mut html_b: String = "".to_string();
             let mut html_r: String = "".to_string();
@@ -416,6 +433,16 @@ impl ThemeNumerologie {
             );
             match x.clone() {
                 TraitementNumerologie::Cai => {
+                    self.cai_mots_cles = self.cai_lame.clone().unwrap().numerologie_mots_cle.as_slice()
+                        .iter()
+                        .map(|x| {
+                            if (x.polarite == Some("+".to_string())) {
+                                (ColorEnum::Bleu, x.mot_cle.clone())
+                            } else {
+                                (ColorEnum::Rouge, x.mot_cle.clone())
+                            }
+                        })
+                        .collect();
                     self.cai_html = HtmlNBR {
                         html,
                         html_b,
@@ -424,6 +451,16 @@ impl ThemeNumerologie {
                     self.cai_aspects = traitement;
                 }
                 TraitementNumerologie::Cae => {
+                    self.cae_mots_cles = self.cae_lame.clone().unwrap().numerologie_mots_cle.as_slice()
+                        .iter()
+                        .map(|x| {
+                            if (x.polarite == Some("+".to_string())) {
+                                (ColorEnum::Bleu, x.mot_cle.clone())
+                            } else {
+                                (ColorEnum::Rouge, x.mot_cle.clone())
+                            }
+                        })
+                        .collect();
                     self.cae_html = HtmlNBR {
                         html,
                         html_b,
@@ -432,9 +469,29 @@ impl ThemeNumerologie {
                     self.cae_aspects = traitement;
                 }
                 TraitementNumerologie::Int => {
+                    self.int_mots_cles = self.int_lame.clone().unwrap().numerologie_mots_cle.as_slice()
+                        .iter()
+                        .map(|x| {
+                            if (x.polarite == Some("+".to_string())) {
+                                (ColorEnum::Bleu, x.mot_cle.clone())
+                            } else {
+                                (ColorEnum::Rouge, x.mot_cle.clone())
+                            }
+                        })
+                        .collect();
                     self.int_html = html;
                 }
                 TraitementNumerologie::Coi => {
+                    self.coi_mots_cles = self.coi_lame.clone().unwrap().numerologie_mots_cle.as_slice()
+                        .iter()
+                        .map(|x| {
+                            if (x.polarite == Some("+".to_string())) {
+                                (ColorEnum::Bleu, x.mot_cle.clone())
+                            } else {
+                                (ColorEnum::Rouge, x.mot_cle.clone())
+                            }
+                        })
+                        .collect();
                     self.coi_html = HtmlNBR {
                         html,
                         html_b,
@@ -443,6 +500,16 @@ impl ThemeNumerologie {
                     self.coi_aspects = traitement;
                 }
                 TraitementNumerologie::Coe => {
+                    self.coe_mots_cles = self.coe_lame.clone().unwrap().numerologie_mots_cle.as_slice()
+                        .iter()
+                        .map(|x| {
+                            if (x.polarite == Some("+".to_string())) {
+                                (ColorEnum::Bleu, x.mot_cle.clone())
+                            } else {
+                                (ColorEnum::Rouge, x.mot_cle.clone())
+                            }
+                        })
+                        .collect();
                     self.coe_html = HtmlNBR {
                         html,
                         html_b,
@@ -451,6 +518,16 @@ impl ThemeNumerologie {
                     self.coe_aspects = traitement;
                 }
                 TraitementNumerologie::Nem => {
+                    self.nem_mots_cles = self.nem_lame.clone().unwrap().numerologie_mots_cle.as_slice()
+                        .iter()
+                        .map(|x| {
+                            if (x.polarite == Some("+".to_string())) {
+                                (ColorEnum::Bleu, x.mot_cle.clone())
+                            } else {
+                                (ColorEnum::Rouge, x.mot_cle.clone())
+                            }
+                        })
+                        .collect();
                     self.nem_html = HtmlNBR {
                         html,
                         html_b,
@@ -459,6 +536,16 @@ impl ThemeNumerologie {
                     self.nem_aspects = traitement;
                 }
                 TraitementNumerologie::Pex => {
+                    self.pex_mots_cles = self.pex_lame.clone().unwrap().numerologie_mots_cle.as_slice()
+                        .iter()
+                        .map(|x| {
+                            if (x.polarite == Some("+".to_string())) {
+                                (ColorEnum::Bleu, x.mot_cle.clone())
+                            } else {
+                                (ColorEnum::Rouge, x.mot_cle.clone())
+                            }
+                        })
+                        .collect();
                     self.pex_html = HtmlNBR {
                         html,
                         html_b,
@@ -467,6 +554,16 @@ impl ThemeNumerologie {
                     self.pex_aspects = traitement;
                 }
                 TraitementNumerologie::Ppr => {
+                    self.ppr_mots_cles = self.ppr_lame.clone().unwrap().numerologie_mots_cle.as_slice()
+                        .iter()
+                        .map(|x| {
+                            if (x.polarite == Some("+".to_string())) {
+                                (ColorEnum::Bleu, x.mot_cle.clone())
+                            } else {
+                                (ColorEnum::Rouge, x.mot_cle.clone())
+                            }
+                        })
+                        .collect();
                     self.ppr_html = HtmlNBR {
                         html,
                         html_b,

@@ -51,16 +51,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         Ok(decoded) => {
                             buf = decoded;
                             if let Some(_) = &ok.get_all().await.ok() {
-                                cai_mots_cles = ok.cai_lame.clone().unwrap().numerologie_mots_cle.as_slice()
-                                    .iter()
-                                    .map(|x| {
-                                        if (x.polarite == Some("+".to_string())) {
-                                            (ColorEnum::Bleu, x.mot_cle.clone())
-                                        } else {
-                                            (ColorEnum::Rouge, x.mot_cle.clone())
-                                        }
-                                    })
-                                    .collect();
+                                cai_mots_cles = ok.cai_mots_cles.as_slice().to_vec();
                                 cai_cartouche = ok.cai_lame.clone().unwrap().cartouche_grimaud.unwrap().to_string();
                                 match ok.get_carte(ok.cai_lame.clone().unwrap().id as i32).await {
                                     Ok(cai_carte_vu8) => {
