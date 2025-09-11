@@ -1,7 +1,7 @@
 use std::io::ErrorKind;
 use base64::Engine;
 use base64::engine::general_purpose;
-use docx_rs::{AbstractNumbering, BreakType, Docx, Footer, Level, LevelJc, LevelText, NumberFormat, Numbering, PageNum, Paragraph, Pic, Run, SpecialIndentType, Start, XMLDocx};
+use docx_rs::{AbstractNumbering, BreakType, Comment, Docx, Footer, Level, LevelJc, LevelText, NumberFormat, Numbering, PageNum, Paragraph, Pic, Run, SpecialIndentType, Start, XMLDocx};
 use crate::api::{TNumerologieClient, ThemeNumerologie};
 use crate::core_docx;
 
@@ -74,8 +74,11 @@ pub async fn prepare_docx(token_n: Option<String>, token_t: Option<String>, id: 
     let pic_nem = Pic::new(&nem_carte.as_slice()).size(width_carte, height_carte);
 
     let footer =
-        Footer::new().add_paragraph(Paragraph::new().add_run(Run::new())
-            .add_page_num(PageNum::new()));
+        Footer::new()
+            .add_paragraph(
+                Paragraph::new().add_run(Run::new()).add_page_num(PageNum::new()))
+            .add_paragraph(Paragraph::new().add_run(Run::new().add_text("Les illustrations des cartes de tarot présentes dans ce document proviennent d’un ensemble restauré et modifié disponible commercialement. Leur utilisation est autorisée uniquement dans un cadre personnel ou commercial sur support physique. Toute redistribution numérique (Word, PDF, images, etc.) est interdite.
+")));
     let docx = Docx::new()
         .footer(footer)
         .add_abstract_numbering(
@@ -105,7 +108,7 @@ pub async fn prepare_docx(token_n: Option<String>, token_t: Option<String>, id: 
             add_run(Run::new()
                 .add_text("")))
         .add_paragraph(Paragraph::new().add_run(Run::new().add_break(BreakType::Page)))
-        .add_table(core_docx::titre_2(format!("Personalité profonde - {}", numerologie.ppr_lame.unwrap().cartouche_grimaud.unwrap()).as_str())?)
+        .add_table(core_docx::titre_2(format!("Personnalité profonde - {}", numerologie.ppr_lame.unwrap().cartouche_grimaud.unwrap()).as_str())?)
         .add_table(core_docx::content_2_trois_etape(
             pic_ppr,
             numerologie.ppr_mots_cles.as_slice(),
@@ -159,7 +162,7 @@ pub async fn prepare_docx(token_n: Option<String>, token_t: Option<String>, id: 
             numerologie.nem_html.html_r.as_str(),
             numerologie.nem_aspects.as_slice())?)
         .add_paragraph(Paragraph::new().add_run(Run::new().add_break(BreakType::Page)))
-        .add_table(core_docx::titre_2(format!("Personalité extérieur - {}", numerologie.pex_lame.unwrap().cartouche_grimaud.unwrap()).as_str())?)
+        .add_table(core_docx::titre_2(format!("Personnalité extérieur - {}", numerologie.pex_lame.unwrap().cartouche_grimaud.unwrap()).as_str())?)
         .add_table(core_docx::content_2_trois_etape(
             pic_pex,
             numerologie.pex_mots_cles.as_slice(),
