@@ -25,7 +25,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Token T: {:?}", token_t);
     let path = std::path::Path::new("./output/examples/image_inline.docx");
     let file = File::create(path).unwrap();
+    let path_cartes = "/Users/stephane/Code/rust/ref/theme_numerologie_docx/images/TAROT-GRIMAUD".to_string();
 
-    prepare_docx(token_n, token_t, 1).await.unwrap().pack(file)?;
+    prepare_docx(token_n, token_t, 1, path_cartes).await.unwrap().pack(file)?;
     Ok(())
 }

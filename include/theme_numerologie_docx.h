@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-const char* theme(const char* password, const char* nom, const char* date, int id);
+const char* theme(const char* password, const char* path_cartes, const char* nom, const char* date, int id);
 
 #endif

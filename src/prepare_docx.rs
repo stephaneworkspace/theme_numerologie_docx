@@ -5,12 +5,12 @@ use docx_rs::{AbstractNumbering, BreakType, Docx, Footer, Level, LevelJc, LevelT
 use crate::api::{TNumerologieClient, ThemeNumerologie};
 use crate::core_docx;
 
-pub async fn prepare_docx(token_n: Option<String>, token_t: Option<String>, id: u32) -> Result<XMLDocx, Box<dyn std::error::Error>> {
+pub async fn prepare_docx(token_n: Option<String>, token_t: Option<String>, id: u32, path_cartes: String) -> Result<XMLDocx, Box<dyn std::error::Error>> {
     let mut buf: Vec<u8> = Vec::new();
     let mut numerologie: Option<ThemeNumerologie> = None;
     if let Some(t_n) = token_n {
         if let Some(t_t) = token_t {
-            let client = TNumerologieClient::new(t_n, t_t);
+            let client = TNumerologieClient::new(t_n, t_t, path_cartes);
             match client.get_index(id).await {
                 Ok(mut ok) => {
                     match general_purpose::STANDARD.decode(&ok.numerologie.png_simple_b64) {

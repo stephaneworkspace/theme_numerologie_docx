@@ -83,12 +83,12 @@ struct ComposeAspect {
 // pub const SW_DEBUG: bool = false;
 
 impl ThemeNumerologie {
-    pub fn new(numerologie: Numerologie, token: String) -> Self {
+    pub fn new(numerologie: Numerologie, token: String, path_cartes: String) -> Self {
         Self {
             base_url: "https://numerologie.bressani.dev:1122".to_string(),
             numerologie,
             token,
-            path_cartes: "/Users/stephane/Code/rust/ref/theme_numerologie_docx/images/TAROT-GRIMAUD".to_string(), // TODO later
+            path_cartes,
             cai_lame: None,
             cai_mots_cles: vec![],
             cai_carte: vec![],
@@ -620,14 +620,16 @@ pub struct Numerologie {
 #[derive(Clone)]
 pub struct TNumerologieClient {
     base_url: String,
+    path_cartes: String,
     token_n: String,
     token_t: String,
 }
 
 impl TNumerologieClient {
-    pub fn new(token_n: String, token_t: String) -> Self {
+    pub fn new(token_n: String, token_t: String, path_cartes: String) -> Self {
         Self {
             base_url: "https://t.bressani.dev:1178".to_string(),
+            path_cartes,
             token_n,
             token_t,
         }
@@ -644,7 +646,7 @@ impl TNumerologieClient {
             .error_for_status()?; // transforme les réponses 4xx/5xx en erreur
 
         let numerologie: Numerologie = resp.json().await?;
-        Ok(ThemeNumerologie::new(numerologie, self.token_n.as_str().to_string()))
+        Ok(ThemeNumerologie::new(numerologie, self.token_n.as_str().to_string(), self.path_cartes.clone()))
     }
 
 }

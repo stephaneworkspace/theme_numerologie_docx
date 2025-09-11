@@ -21,7 +21,7 @@ use std::path::PathBuf;
 use crate::prepare_docx::prepare_docx;
 
 #[no_mangle]
-pub extern "C" fn theme(password: *const libc::c_char, nom: *const libc::c_char, date: *const libc::c_char, id: libc::c_int) -> *const libc::c_char {
+pub extern "C" fn theme(password: *const libc::c_char, path_cartes: *const libc::c_char, nom: *const libc::c_char, date: *const libc::c_char, id: libc::c_int) -> *const libc::c_char {
     use std::ffi::CStr;
     unsafe {
         let name = CStr::from_ptr(nom).to_str().unwrap_or("invalid");
@@ -32,6 +32,11 @@ pub extern "C" fn theme(password: *const libc::c_char, nom: *const libc::c_char,
     // Conversion
     let c_str = unsafe { CStr::from_ptr(password) };
     let password_str = match c_str.to_str() {
+        Ok(s) => s,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    let c_str = unsafe { CStr::from_ptr(path_cartes) };
+    let path_cartes_str = match c_str.to_str() {
         Ok(s) => s,
         Err(_) => return std::ptr::null_mut(),
     };
@@ -62,7 +67,7 @@ pub extern "C" fn theme(password: *const libc::c_char, nom: *const libc::c_char,
 
         // Créer un buffer avec Cursor
         let mut buffer = Cursor::new(Vec::new());
-        let docx_res = prepare_docx(token_n.clone(), token_t.clone(), id_u32).await.unwrap().pack(&mut buffer);
+        let docx_res = prepare_docx(token_n.clone(), token_t.clone(), id_u32, path_cartes_str.to_string()).await.unwrap().pack(&mut buffer);
 
         if let Err(e) = docx_res {
             error!("Erreur lors de la génération du docx : {}", e);
