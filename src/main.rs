@@ -74,10 +74,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let width_carte = ((40 as f64) * 192.0 * 200.0).round() as u32;
     let height_carte = ((75 as f64) * 192.0 * 200.0).round() as u32;
-    let cai_carte: Vec<u8> = numerologie.cai_carte.as_slice().to_vec();
     let ppr_carte: Vec<u8> = numerologie.ppr_carte.as_slice().to_vec();
-    let pic_cai = Pic::new(&cai_carte.as_slice()).size(width_carte, height_carte);
+    let cai_carte: Vec<u8> = numerologie.cai_carte.as_slice().to_vec();
+    let cae_carte: Vec<u8> = numerologie.cae_carte.as_slice().to_vec();
     let pic_ppr = Pic::new(&ppr_carte.as_slice()).size(width_carte, height_carte);
+    let pic_cai = Pic::new(&cai_carte.as_slice()).size(width_carte, height_carte);
+    let pic_cae = Pic::new(&cae_carte.as_slice()).size(width_carte, height_carte);
 
     let footer =
         Footer::new().add_paragraph(Paragraph::new().add_run(Run::new())
@@ -119,6 +121,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             numerologie.ppr_html.html_b.as_str(),
             numerologie.ppr_html.html_r.as_str(),
             numerologie.ppr_aspects.as_slice())?)
+        .add_paragraph(Paragraph::new().add_run(Run::new().add_break(BreakType::Page)))
+        .add_table(core_docx::titre_2(format!("Caractère extérieur - {}", numerologie.cae_lame.unwrap().cartouche_grimaud.unwrap()).as_str())?)
+        .add_table(core_docx::content_2_trois_etape(
+            pic_cae,
+            numerologie.cae_mots_cles.as_slice(),
+            numerologie.cae_html.html.as_str(),
+            numerologie.cae_html.html_b.as_str(),
+            numerologie.cae_html.html_r.as_str(),
+            numerologie.cae_aspects.as_slice())?)
         .add_paragraph(Paragraph::new().add_run(Run::new().add_break(BreakType::Page)))
         .add_table(core_docx::titre_2(format!("Caractère intérieur - {}", numerologie.cai_lame.unwrap().cartouche_grimaud.unwrap()).as_str())?)
         .add_table(core_docx::content_2_trois_etape(
