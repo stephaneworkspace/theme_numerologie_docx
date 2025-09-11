@@ -275,7 +275,6 @@ impl ThemeNumerologie {
         let mut pex: Option<NumerologiePersonaliteExterieure> = None;
         let mut ppr: Option<NumerologiePersonaliteProfonde> = None;
         TraitementNumerologie::iter().for_each(|x| {
-            let mut mots_cles: Vec<(ColorEnum, String)> = vec![];
             let mut html: String = "".to_string();
             let mut html_b: String = "".to_string();
             let mut html_r: String = "".to_string();
@@ -549,7 +548,7 @@ impl ThemeNumerologie {
                         html_r,
                     );
                     self.ppr_mots_cles = mots_cles;
-                    self.ppr_carte = self.get_carte(self.pex_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.ppr_carte = self.get_carte(self.ppr_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
                     self.ppr_html = html_struct;
                     self.ppr_aspects = traitement_aspects;
                 }
