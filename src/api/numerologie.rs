@@ -205,12 +205,10 @@ impl ThemeNumerologie {
                     self.numerologie.interpretation_coe as u32
                 }
                 TraitementNumerologie::Nem => {
-                    2
-                    //self.numerologie.interpretation_nem as u32
+                    self.numerologie.interpretation_nem as u32
                 }
                 TraitementNumerologie::Pex => {
-                    2
-                    //self.numerologie.interpretation_pex as u32
+                    self.numerologie.interpretation_pex as u32
                 }
                 TraitementNumerologie::Ppr => {
                     self.numerologie.interpretation_ppr as u32
@@ -256,7 +254,7 @@ impl ThemeNumerologie {
         Ok(())
     }
 
-    fn get_carte(&self, id: i32) -> Result<Vec<u8>, String> {
+    fn get_carte(&self, id: u32) -> Result<Vec<u8>, String> {
         //std::io::Error> {
         let file_name = format!("{}.jpg", id);
         let path = std::path::Path::new(&self.path_cartes).join(file_name);
@@ -454,7 +452,7 @@ impl ThemeNumerologie {
                         html_r,
                     );
                     self.cai_mots_cles = mots_cles;
-                    self.cai_carte = self.get_carte(self.cai_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.cai_carte = self.get_carte(self.cai_lame.as_ref().unwrap().id).unwrap(); // TODO intercepté le error IO
                     self.cai_html = html_struct;
                     self.cai_aspects = traitement_aspects;
                 }
@@ -467,7 +465,7 @@ impl ThemeNumerologie {
                         html_r,
                     );
                     self.cae_mots_cles = mots_cles;
-                    self.cae_carte = self.get_carte(self.cae_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.cae_carte = self.get_carte(self.cae_lame.as_ref().unwrap().id).unwrap(); // TODO intercepté le error IO
                     self.cae_html = html_struct;
                     self.cae_aspects = traitement_aspects;
                 }
@@ -480,7 +478,7 @@ impl ThemeNumerologie {
                         html_r,
                     );
                     self.int_mots_cles = mots_cles;
-                    self.int_carte = self.get_carte(self.int_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.int_carte = self.get_carte(self.int_lame.as_ref().unwrap().id).unwrap(); // TODO intercepté le error IO
                     self.int_html = html_struct.html;
                 }
                 TraitementNumerologie::Coi => {
@@ -492,7 +490,7 @@ impl ThemeNumerologie {
                         html_r,
                     );
                     self.coi_mots_cles = mots_cles;
-                    self.coi_carte = self.get_carte(self.coi_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.coi_carte = self.get_carte(self.coi_lame.as_ref().unwrap().id).unwrap(); // TODO intercepté le error IO
                     self.coi_html = html_struct;
                     self.coi_aspects = traitement_aspects;
                 }
@@ -505,7 +503,7 @@ impl ThemeNumerologie {
                         html_r,
                     );
                     self.coe_mots_cles = mots_cles;
-                    self.coe_carte = self.get_carte(self.coe_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.coe_carte = self.get_carte(self.coe_lame.as_ref().unwrap().id).unwrap(); // TODO intercepté le error IO
                     self.coe_html = html_struct;
                     self.coe_aspects = traitement_aspects;
                 }
@@ -518,7 +516,7 @@ impl ThemeNumerologie {
                         html_r,
                     );
                     self.nem_mots_cles = mots_cles;
-                    self.nem_carte = self.get_carte(self.nem_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.nem_carte = self.get_carte(self.nem_lame.as_ref().unwrap().id).unwrap(); // TODO intercepté le error IO
                     self.nem_html = html_struct;
                     self.nem_aspects = traitement_aspects;
                 }
@@ -531,7 +529,7 @@ impl ThemeNumerologie {
                         html_r,
                     );
                     self.pex_mots_cles = mots_cles;
-                    self.pex_carte = self.get_carte(self.pex_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.pex_carte = self.get_carte(self.pex_lame.as_ref().unwrap().id).unwrap(); // TODO intercepté le error IO
                     self.pex_html = html_struct;
                     self.pex_aspects = traitement_aspects;
                 }
@@ -544,7 +542,7 @@ impl ThemeNumerologie {
                         html_r,
                     );
                     self.ppr_mots_cles = mots_cles;
-                    self.ppr_carte = self.get_carte(self.ppr_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.ppr_carte = self.get_carte(self.ppr_lame.as_ref().unwrap().id).unwrap(); // TODO intercepté le error IO
                     self.ppr_html = html_struct;
                     self.ppr_aspects = traitement_aspects;
                 }
@@ -568,14 +566,14 @@ fn transformer_mots_cles(mots: &[NumerologieMotCle]) -> Vec<(ColorEnum, String)>
 
 fn traiter_lame(
     lame: &Option<LameMajeureDetail>,
-    get_carte: impl Fn(i32) -> Result<Vec<u8>, String>,
+    get_carte: impl Fn(u32) -> Result<Vec<u8>, String>,
     html: String,
     html_b: String,
     html_r: String,
 ) -> (Vec<(ColorEnum, String)>, HtmlNBR) {
     let mots_cles = transformer_mots_cles(&lame.as_ref().unwrap().numerologie_mots_cle);
 
-    let carte = match get_carte(lame.as_ref().unwrap().id as i32) {
+    let carte = match get_carte(lame.as_ref().unwrap().id) {
         Ok(vu8) => vu8,
         Err(e) => {
             eprintln!("Erreur de traitement sur la carte: {}", e);
@@ -590,32 +588,32 @@ fn traiter_lame(
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Numerologie {
-    pub id: i32,
-    pub numerologie_type: i32,
+    pub id: u32,
+    pub numerologie_type: u32,
     pub resume_rapide: String,
     pub text: String,
     pub png_b64: String,
     pub png_simple_b64: String,
-    pub jour: i32,
-    pub mois: i32,
-    pub annee: i32,
-    pub interpretation_cae: i32,
+    pub jour: u32,
+    pub mois: u32,
+    pub annee: u32,
+    pub interpretation_cae: u32,
     pub interpretation_01_cae_i: String,
-    pub interpretation_cai: i32,
+    pub interpretation_cai: u32,
     pub interpretation_01_cai_i: String,
-    pub interpretation_coe: i32,
+    pub interpretation_coe: u32,
     pub interpretation_01_coe_i: String,
-    pub interpretation_coi: i32,
+    pub interpretation_coi: u32,
     pub interpretation_01_coi_i: String,
-    pub interpretation_int: i32,
+    pub interpretation_int: u32,
     pub interpretation_01_int_i: String,
-    pub interpretation_nem: i32,
+    pub interpretation_nem: u32,
     pub interpretation_01_nem_i: String,
-    pub interpretation_pex: i32,
+    pub interpretation_pex: u32,
     pub interpretation_01_pex_i: String,
-    pub interpretation_ppr: i32,
+    pub interpretation_ppr: u32,
     pub interpretation_01_ppr_i: String,
-    pub interpretation_rha: i32,
+    pub interpretation_rha: u32,
     pub interpretation_01_rha_i: String,
 }
 
