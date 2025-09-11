@@ -62,7 +62,7 @@ pub extern "C" fn theme(password: *const libc::c_char, nom: *const libc::c_char,
 
         // Créer un buffer avec Cursor
         let mut buffer = Cursor::new(Vec::new());
-        let docx_res = prepare_docx(token_n, token_t, id_u32).await.unwrap().pack(&mut buffer);
+        let docx_res = prepare_docx(token_n.clone(), token_t.clone(), id_u32).await.unwrap().pack(&mut buffer);
 
         if let Err(e) = docx_res {
             error!("Erreur lors de la génération du docx : {}", e);
