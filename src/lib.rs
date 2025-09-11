@@ -91,5 +91,7 @@ pub extern "C" fn theme(password: *const libc::c_char, path_cartes: *const libc:
             CString::new(format!("{{\"error\":\"{}\"}}", msg)).unwrap()
         }
     };
+    eprintln!("Json : {:?}", json_cstring.clone().into_raw());
+
     json_cstring.into_raw()
 }

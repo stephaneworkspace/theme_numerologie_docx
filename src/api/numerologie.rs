@@ -258,8 +258,11 @@ impl ThemeNumerologie {
         //std::io::Error> {
         let file_name = format!("{}.jpg", id);
         let path = std::path::Path::new(&self.path_cartes).join(file_name);
-        let data = fs::read(path).unwrap(); // TODO ?
-        Ok(data)
+        let data = fs::read(&path);
+        match data {
+            Ok(ok) => Ok(ok),
+            Err(e) => Err(format!("Mauvais path: {:?} - {:?}", path.as_path().to_str(), e))
+        }
     }
 
     /// La fonction est privée: compute_html_and_aspect
