@@ -75,15 +75,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let width_carte = ((40 as f64) * 192.0 * 200.0).round() as u32;
     let height_carte = ((75 as f64) * 192.0 * 200.0).round() as u32;
     let ppr_carte: Vec<u8> = numerologie.ppr_carte.as_slice().to_vec();
+    let pex_carte: Vec<u8> = numerologie.pex_carte.as_slice().to_vec();
     let cai_carte: Vec<u8> = numerologie.cai_carte.as_slice().to_vec();
     let cae_carte: Vec<u8> = numerologie.cae_carte.as_slice().to_vec();
     let coi_carte: Vec<u8> = numerologie.coi_carte.as_slice().to_vec();
     let coe_carte: Vec<u8> = numerologie.coe_carte.as_slice().to_vec();
+    let nem_carte: Vec<u8> = numerologie.nem_carte.as_slice().to_vec();
     let pic_ppr = Pic::new(&ppr_carte.as_slice()).size(width_carte, height_carte);
+    let pic_pex = Pic::new(&pex_carte.as_slice()).size(width_carte, height_carte);
     let pic_cai = Pic::new(&cai_carte.as_slice()).size(width_carte, height_carte);
     let pic_cae = Pic::new(&cae_carte.as_slice()).size(width_carte, height_carte);
     let pic_coi = Pic::new(&coi_carte.as_slice()).size(width_carte, height_carte);
     let pic_coe = Pic::new(&coe_carte.as_slice()).size(width_carte, height_carte);
+    let pic_nem = Pic::new(&nem_carte.as_slice()).size(width_carte, height_carte);
 
     let footer =
         Footer::new().add_paragraph(Paragraph::new().add_run(Run::new())
@@ -161,6 +165,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             numerologie.coi_html.html_b.as_str(),
             numerologie.coi_html.html_r.as_str(),
             numerologie.coi_aspects.as_slice())?)
+        .add_paragraph(Paragraph::new().add_run(Run::new().add_break(BreakType::Page)))
+        .add_table(core_docx::titre_2(format!("Nœud émotionnel - {}", numerologie.nem_lame.unwrap().cartouche_grimaud.unwrap()).as_str())?)
+        .add_table(core_docx::content_2_trois_etape(
+            pic_nem,
+            numerologie.nem_mots_cles.as_slice(),
+            numerologie.nem_html.html.as_str(),
+            numerologie.nem_html.html_b.as_str(),
+            numerologie.nem_html.html_r.as_str(),
+            numerologie.nem_aspects.as_slice())?)
+        .add_paragraph(Paragraph::new().add_run(Run::new().add_break(BreakType::Page)))
+        .add_table(core_docx::titre_2(format!("Personalité extérieur - {}", numerologie.pex_lame.unwrap().cartouche_grimaud.unwrap()).as_str())?)
+        .add_table(core_docx::content_2_trois_etape(
+            pic_pex,
+            numerologie.pex_mots_cles.as_slice(),
+            numerologie.pex_html.html.as_str(),
+            numerologie.pex_html.html_b.as_str(),
+            numerologie.pex_html.html_r.as_str(),
+            numerologie.pex_aspects.as_slice())?)
         .add_numbering(Numbering::new(2, 2))
         .build()
         .pack(file)?;

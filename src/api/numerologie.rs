@@ -205,10 +205,12 @@ impl ThemeNumerologie {
                     self.numerologie.interpretation_coe as u32
                 }
                 TraitementNumerologie::Nem => {
-                    self.numerologie.interpretation_nem as u32
+                    2
+                    //self.numerologie.interpretation_nem as u32
                 }
                 TraitementNumerologie::Pex => {
-                    self.numerologie.interpretation_pex as u32
+                    2
+                    //self.numerologie.interpretation_pex as u32
                 }
                 TraitementNumerologie::Ppr => {
                     self.numerologie.interpretation_ppr as u32
@@ -358,7 +360,6 @@ impl ThemeNumerologie {
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw.clone())
                         .unwrap_or_else(|| "".to_string());
-                    /*
                     html_b = nem
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw_b.clone())
@@ -366,7 +367,7 @@ impl ThemeNumerologie {
                     html_r = nem
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw_r.clone())
-                        .unwrap_or_else(|| "".to_string());*/
+                        .unwrap_or_else(|| "".to_string());
                 }
                 TraitementNumerologie::Pex => {
                     pex = self.pex_lame.clone().unwrap().numerologie_personalite_exterieure.clone();
@@ -375,7 +376,6 @@ impl ThemeNumerologie {
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw.clone())
                         .unwrap_or_else(|| "".to_string());
-                    /*
                     html_b = pex
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw_b.clone())
@@ -383,7 +383,7 @@ impl ThemeNumerologie {
                     html_r = pex
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw_r.clone())
-                        .unwrap_or_else(|| "".to_string());*/
+                        .unwrap_or_else(|| "".to_string());
                 }
                 TraitementNumerologie::Ppr => {
                     ppr = self.ppr_lame.clone().unwrap().numerologie_personalite_profonde.clone();
