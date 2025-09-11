@@ -64,20 +64,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     //println!("{:?}", buf);
     let numerologie = numerologie.unwrap(); // TODO later
-    let cai_carte: Vec<u8> = numerologie.cai_carte.as_slice().to_vec();
-    let cai: String = numerologie.cai_html.html;
-    let cai_b: String = numerologie.cai_html.html_b;
-    let cai_r: String = numerologie.cai_html.html_r;
-    let cai_cartouche: String = numerologie.cai_lame.unwrap().cartouche_grimaud.unwrap().to_string();
-    let cai_mots_cles: Vec<(ColorEnum, String)> = numerologie.cai_mots_cles.as_slice().to_vec();
-    let cai_aspects: Vec<NumerologieAspects> = numerologie.cai_aspects.as_slice().to_vec();
-    let ppr_carte: Vec<u8> = numerologie.ppr_carte.as_slice().to_vec();
-    let ppr: String = numerologie.ppr_html.html;
-    let ppr_b: String = numerologie.ppr_html.html_b;
-    let ppr_r: String = numerologie.ppr_html.html_r;
-    let ppr_cartouche: String = numerologie.ppr_lame.unwrap().cartouche_grimaud.unwrap().to_string();
-    let ppr_mots_cles: Vec<(ColorEnum, String)> = numerologie.ppr_mots_cles.as_slice().to_vec();
-    let ppr_aspects: Vec<NumerologieAspects> = numerologie.ppr_aspects.as_slice().to_vec();
 
     let width = ((720 as f64) * 192.0 * 38.7).round() as u32;
     let height = ((397 as f64) * 192.0 * 38.7).round() as u32;
@@ -86,10 +72,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let path = std::path::Path::new("./output/examples/image_inline.docx");
     let file = File::create(path).unwrap();
 
-    let width_cai = ((40 as f64) * 192.0 * 200.0).round() as u32;
-    let height_cai = ((75 as f64) * 192.0 * 200.0).round() as u32;
-    let pic_cai = Pic::new(&cai_carte.as_slice()).size(width_cai, height_cai);
-    let pic_ppr = Pic::new(&ppr_carte.as_slice()).size(width_cai, height_cai);
+    let width_carte = ((40 as f64) * 192.0 * 200.0).round() as u32;
+    let height_carte = ((75 as f64) * 192.0 * 200.0).round() as u32;
+    let cai_carte: Vec<u8> = numerologie.cai_carte.as_slice().to_vec();
+    let ppr_carte: Vec<u8> = numerologie.ppr_carte.as_slice().to_vec();
+    let pic_cai = Pic::new(&cai_carte.as_slice()).size(width_carte, height_carte);
+    let pic_ppr = Pic::new(&ppr_carte.as_slice()).size(width_carte, height_carte);
 
     let footer =
         Footer::new().add_paragraph(Paragraph::new().add_run(Run::new())
@@ -123,11 +111,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             add_run(Run::new()
                 .add_text("")))
         .add_paragraph(Paragraph::new().add_run(Run::new().add_break(BreakType::Page)))
-        .add_table(core_docx::titre_2(format!("Personalité profonde - {}", ppr_cartouche).as_str())?)
-        .add_table(core_docx::content_2_trois_etape(pic_ppr, ppr_mots_cles.as_slice(), ppr.as_str(), ppr_b.as_str(),ppr_r.as_str(), ppr_aspects.as_slice())?)
+        .add_table(core_docx::titre_2(format!("Personalité profonde - {}", numerologie.ppr_lame.unwrap().cartouche_grimaud.unwrap()).as_str())?)
+        .add_table(core_docx::content_2_trois_etape(
+            pic_ppr,
+            numerologie.ppr_mots_cles.as_slice(),
+            numerologie.ppr_html.html.as_str(),
+            numerologie.ppr_html.html_b.as_str(),
+            numerologie.ppr_html.html_r.as_str(),
+            numerologie.ppr_aspects.as_slice())?)
         .add_paragraph(Paragraph::new().add_run(Run::new().add_break(BreakType::Page)))
-        .add_table(core_docx::titre_2(format!("Caractère intérieur - {}", cai_cartouche).as_str())?)
-        .add_table(core_docx::content_2_trois_etape(pic_cai, cai_mots_cles.as_slice(), cai.as_str(), cai_b.as_str(),cai_r.as_str(), cai_aspects.as_slice())?)
+        .add_table(core_docx::titre_2(format!("Caractère intérieur - {}", numerologie.cai_lame.unwrap().cartouche_grimaud.unwrap()).as_str())?)
+        .add_table(core_docx::content_2_trois_etape(
+            pic_cai,
+            numerologie.cai_mots_cles.as_slice(),
+            numerologie.cai_html.html.as_str(),
+            numerologie.cai_html.html_b.as_str(),
+            numerologie.cai_html.html_r.as_str(),
+            numerologie.cai_aspects.as_slice())?)
         .add_numbering(Numbering::new(2, 2))
         .build()
         .pack(file)?;
