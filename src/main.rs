@@ -28,35 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Token T: {:?}", token_t);
 
     let mut buf: Vec<u8> = Vec::new();
-    let mut numerologie: ThemeNumerologie = ThemeNumerologie::new(Numerologie {
-        id: 0,
-        numerologie_type: 0,
-        resume_rapide: "".to_string(),
-        text: "".to_string(),
-        png_b64: "".to_string(),
-        png_simple_b64: "".to_string(),
-        jour: 0,
-        mois: 0,
-        annee: 0,
-        interpretation_cae: 0,
-        interpretation_01_cae_i: "".to_string(),
-        interpretation_cai: 0,
-        interpretation_01_cai_i: "".to_string(),
-        interpretation_coe: 0,
-        interpretation_01_coe_i: "".to_string(),
-        interpretation_coi: 0,
-        interpretation_01_coi_i: "".to_string(),
-        interpretation_int: 0,
-        interpretation_01_int_i: "".to_string(),
-        interpretation_nem: 0,
-        interpretation_01_nem_i: "".to_string(),
-        interpretation_pex: 0,
-        interpretation_01_pex_i: "".to_string(),
-        interpretation_ppr: 0,
-        interpretation_01_ppr_i: "".to_string(),
-        interpretation_rha: 0,
-        interpretation_01_rha_i: "".to_string(),
-    }, "".to_string());
+    let mut numerologie: Option<ThemeNumerologie> = None;
     if let Some(t_n) = token_n {
         if let Some(t_t) = token_t {
             let client = TNumerologieClient::new(t_n, t_t);
@@ -66,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         Ok(decoded) => {
                             buf = decoded;
                             if let Some(_) = &ok.get_all().await.ok() {
-                                numerologie = ok.clone();
+                                numerologie = Some(ok.clone());
                             } else {
                                 println!("Aucun contenu disponible");
                             }
@@ -91,6 +63,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         std::process::exit(1);
     }
     //println!("{:?}", buf);
+    let numerologie = numerologie.unwrap(); // TODO later
     let cai_carte: Vec<u8> = numerologie.cai_carte.as_slice().to_vec();
     let cai: String = numerologie.cai_html.html;
     let cai_b: String = numerologie.cai_html.html_b;
