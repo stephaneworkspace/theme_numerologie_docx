@@ -12,20 +12,27 @@ pub struct ThemeNumerologie {
     pub numerologie: Numerologie,
     pub token: String,
     path_cartes: String,
-    lame_majeure_detail: LameMajeureDetail,
+    pub cai_lame: Option<LameMajeureDetail>,
     pub cai_html: HtmlNBR,
     pub cai_aspects: Vec<NumerologieAspects>,
+    pub cae_lame: Option<LameMajeureDetail>,
     pub cae_html: HtmlNBR,
     pub cae_aspects: Vec<NumerologieAspects>,
+    pub int_lame: Option<LameMajeureDetail>,
     pub int_html: String,
+    pub coi_lame: Option<LameMajeureDetail>,
     pub coi_html: HtmlNBR,
     pub coi_aspects: Vec<NumerologieAspects>,
+    pub coe_lame: Option<LameMajeureDetail>,
     pub coe_html: HtmlNBR,
     pub coe_aspects: Vec<NumerologieAspects>,
+    pub nem_lame: Option<LameMajeureDetail>,
     pub nem_html: HtmlNBR,
     pub nem_aspects: Vec<NumerologieAspects>,
+    pub pex_lame: Option<LameMajeureDetail>,
     pub pex_html: HtmlNBR,
     pub pex_aspects: Vec<NumerologieAspects>,
+    pub ppr_lame: Option<LameMajeureDetail>,
     pub ppr_html: HtmlNBR,
     pub ppr_aspects: Vec<NumerologieAspects>,
 }
@@ -65,69 +72,51 @@ impl ThemeNumerologie {
             numerologie,
             token,
             path_cartes: "/Users/stephane/Code/rust/ref/theme_numerologie_docx/images/TAROT-GRIMAUD".to_string(), // TODO later
-            lame_majeure_detail: LameMajeureDetail {
-                id: 0,
-                nombre: 0,
-                nombre_romain: "".to_string(),
-                nom: None,
-                cartouche_grimaud: None,
-                lame_majeures_divination: None,
-                lame_majeures_divination_detail: None,
-                lame_majeures_divination_principes: None,
-                divination_associations_classiques: vec![],
-                divination_personnages: vec![],
-                lame_majeures_numerologie: None,
-                numerologie_aspects: vec![],
-                numerologie_mots_cle: vec![],
-                numerologie_note_de_cours: vec![],
-                numerologie_message_karmique: None,
-                numerologie_personalite_profonde: None,
-                numerologie_caractere_intime: None,
-                numerologie_intellect: None,
-                numerologie_caractere_social: None,
-                numerologie_noeud_emotionnel: None,
-                numerologie_comportement_intime: None,
-                numerologie_comportement_social: None,
-                numerologie_personalite_exterieure: None,
-                numerologie_vocabulaire_divers: vec![],
-            },
+            cai_lame: None,
             cai_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
                 html_r: "".to_string(),
             },
             cai_aspects: vec![],
+            cae_lame: None,
             cae_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
                 html_r: "".to_string(),
             },
             cae_aspects: vec![],
+            int_lame: None,
             int_html: "".to_string(),
+            coi_lame: None,
             coi_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
                 html_r: "".to_string(),
             },
             coi_aspects: vec![],
+            coe_lame: None,
             coe_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
                 html_r: "".to_string(),
             },
             coe_aspects: vec![],
+            nem_lame: None,
             nem_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
                 html_r: "".to_string(),
             },
             nem_aspects: vec![],
+            pex_lame: None,
             pex_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
                 html_r: "".to_string(),
             },
             pex_aspects: vec![],
+            ppr_lame: None,
             ppr_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
@@ -137,8 +126,7 @@ impl ThemeNumerologie {
         }
     }
 
-    /// get_cai permet de charger les données Cai
-    pub async fn get_cai(&mut self, carte: u32) -> Result<(i32, LameMajeureDetail), reqwest::Error> {
+    /*pub async fn get_cai(&mut self, carte: u32) -> Result<(i32, LameMajeureDetail), reqwest::Error> {
         let url = format!("{}/api/lame_majeures/{}", self.base_url, carte);
         let client = Client::new();
         let resp: Response =
@@ -163,6 +151,74 @@ impl ThemeNumerologie {
             self.compute_html_and_aspect(lame_majeure_detail);
             Ok((self.numerologie.interpretation_cai, self.get_lame_majeure_detail()))
         }
+    }*/
+
+    pub async fn get_all(&mut self) -> Result<(()), reqwest::Error> {
+        for x in TraitementNumerologie::iter() {
+            let carte: u32 = match &x  {
+                TraitementNumerologie::Cai => {
+                    self.numerologie.interpretation_cai as u32
+                },
+                TraitementNumerologie::Cae => {
+                    self.numerologie.interpretation_cae as u32
+                }
+                TraitementNumerologie::Int => {
+                    self.numerologie.interpretation_int as u32
+                }
+                TraitementNumerologie::Coi => {
+                    self.numerologie.interpretation_coi as u32
+                }
+                TraitementNumerologie::Coe => {
+                    self.numerologie.interpretation_coe as u32
+                }
+                TraitementNumerologie::Nem => {
+                    self.numerologie.interpretation_nem as u32
+                }
+                TraitementNumerologie::Pex => {
+                    self.numerologie.interpretation_pex as u32
+                }
+                TraitementNumerologie::Ppr => {
+                    self.numerologie.interpretation_ppr as u32
+                }
+            };
+            let url = format!("{}/api/lame_majeures/{}", self.base_url, carte);
+            let client = Client::new();
+            let resp: Response =
+                client
+                    .get(&url)
+                    .bearer_auth(&self.token)
+                    .send()
+                    .await?
+                    .error_for_status()?;
+            match &x {
+                TraitementNumerologie::Cai => {
+                    self.cai_lame = Some(resp.json().await?);
+                }
+                TraitementNumerologie::Cae => {
+                    self.cae_lame = Some(resp.json().await?);
+                }
+                TraitementNumerologie::Int => {
+                    self.int_lame = Some(resp.json().await?);
+                }
+                TraitementNumerologie::Coi => {
+                    self.coi_lame = Some(resp.json().await?);
+                }
+                TraitementNumerologie::Coe => {
+                    self.coe_lame = Some(resp.json().await?);
+                }
+                TraitementNumerologie::Nem => {
+                    self.nem_lame = Some(resp.json().await?);
+                }
+                TraitementNumerologie::Pex => {
+                    self.pex_lame = Some(resp.json().await?);
+                }
+                TraitementNumerologie::Ppr => {
+                    self.ppr_lame = Some(resp.json().await?);
+                }
+            }
+        }
+        self.compute_html_and_aspect_data();
+        Ok(())
     }
 
     pub async fn get_carte(&self, id: i32) -> Result<Vec<u8>, std::io::Error> {
@@ -172,14 +228,10 @@ impl ThemeNumerologie {
         Ok(data)
     }
 
-    pub fn get_lame_majeure_detail(&self) -> LameMajeureDetail {
-        self.lame_majeure_detail.clone()
-    }
-
-    /// La fonction: compute_html_and_aspect
+    /// La fonction est privée: compute_html_and_aspect
     /// - Permet de préparer les champs en fonction du type de traitement
-    fn compute_html_and_aspect(&mut self, lame_majeur_detail: LameMajeureDetail) {
-        self.lame_majeure_detail = lame_majeur_detail;
+    fn compute_html_and_aspect_data(&mut self) {
+        let mut lame_majeure_detail: Option<LameMajeureDetail> = None;
         let mut cai: Option<NumerologieCaractereIntime> = None;
         let mut cae: Option<NumerologieCaractereSocial> = None;
         let mut int: Option<NumerologieIntellect> = None;
@@ -194,7 +246,8 @@ impl ThemeNumerologie {
             let mut html_r: String = "".to_string();
             match x.clone() {
                 TraitementNumerologie::Cai => {
-                    cai = self.lame_majeure_detail.numerologie_caractere_intime.clone();
+                    cai = self.cai_lame.clone().unwrap().numerologie_caractere_intime.clone(); // TODO
+                    lame_majeure_detail = self.cai_lame.clone();
                     html = cai
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw.clone())
@@ -209,7 +262,8 @@ impl ThemeNumerologie {
                         .unwrap_or_else(|| "".to_string());
                 }
                 TraitementNumerologie::Cae => {
-                    cae = self.lame_majeure_detail.numerologie_caractere_social.clone();
+                    cae = self.cae_lame.clone().unwrap().numerologie_caractere_social.clone();
+                    lame_majeure_detail = self.cae_lame.clone();
                     html = cae
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw.clone())
@@ -225,14 +279,16 @@ impl ThemeNumerologie {
                         .unwrap_or_else(|| "".to_string());*/
                 }
                 TraitementNumerologie::Int => {
-                    int = self.lame_majeure_detail.numerologie_intellect.clone();
+                    int = self.int_lame.clone().unwrap().numerologie_intellect.clone();
+                    lame_majeure_detail = self.int_lame.clone();
                     html = int
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw.clone())
                         .unwrap_or_else(|| "".to_string());
                 }
                 TraitementNumerologie::Coi => {
-                    coi = self.lame_majeure_detail.numerologie_comportement_intime.clone();
+                    coi = self.coi_lame.clone().unwrap().numerologie_comportement_intime.clone();
+                    lame_majeure_detail = self.coi_lame.clone();
                     html = coi
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw.clone())
@@ -248,7 +304,8 @@ impl ThemeNumerologie {
                         .unwrap_or_else(|| "".to_string());*/
                 }
                 TraitementNumerologie::Coe => {
-                    coe = self.lame_majeure_detail.numerologie_comportement_social.clone();
+                    coe = self.coe_lame.clone().unwrap().numerologie_comportement_social.clone();
+                    lame_majeure_detail = self.coe_lame.clone();
                     html = coe
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw.clone())
@@ -264,7 +321,8 @@ impl ThemeNumerologie {
                         .unwrap_or_else(|| "".to_string());*/
                 }
                 TraitementNumerologie::Nem => {
-                    nem = self.lame_majeure_detail.numerologie_noeud_emotionnel.clone();
+                    nem = self.nem_lame.clone().unwrap().numerologie_noeud_emotionnel.clone();
+                    lame_majeure_detail = self.nem_lame.clone();
                     html = nem
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw.clone())
@@ -280,7 +338,8 @@ impl ThemeNumerologie {
                         .unwrap_or_else(|| "".to_string());*/
                 }
                 TraitementNumerologie::Pex => {
-                    pex = self.lame_majeure_detail.numerologie_personalite_exterieure.clone();
+                    pex = self.pex_lame.clone().unwrap().numerologie_personalite_exterieure.clone();
+                    lame_majeure_detail = self.pex_lame.clone();
                     html = pex
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw.clone())
@@ -296,7 +355,8 @@ impl ThemeNumerologie {
                         .unwrap_or_else(|| "".to_string());*/
                 }
                 TraitementNumerologie::Ppr => {
-                    ppr = self.lame_majeure_detail.numerologie_personalite_profonde.clone();
+                    ppr = self.ppr_lame.clone().unwrap().numerologie_personalite_profonde.clone();
+                    lame_majeure_detail = self.ppr_lame.clone();
                     html = ppr
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw.clone())
@@ -315,7 +375,7 @@ impl ThemeNumerologie {
             let mut aspects_b: Vec<String> = vec![];
             let mut aspects_r: Vec<String> = vec![];
             let mut bold_aspects: Vec<String> = vec![];
-            bold_aspects = self.lame_majeure_detail.numerologie_aspects.as_slice()
+            bold_aspects = lame_majeure_detail.clone().unwrap().numerologie_aspects.as_slice()
                 .iter()
                 .filter(|x| {
                     x.sw_bold && x.nom.clone().is_some()
