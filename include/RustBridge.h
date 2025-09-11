@@ -3,6 +3,6 @@
 
 #include <stdio.h>
 
-const char* theme(const char* password, const char* png, const char* nom, const char* date);
+const char* theme(const char* password, const char* nom, const char* date, int id);
 
 #endif /* RustBridge_h */

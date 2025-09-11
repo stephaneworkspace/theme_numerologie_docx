@@ -3,8 +3,8 @@ extern crate core;
 mod core_docx;
 mod api;
 mod password;
-
 pub mod html_tools;
+mod prepare_docx;
 
 // mod tools;
 use docx_rs::*;
@@ -18,9 +18,10 @@ use serde_json::Value;
 use log::error;
 use std::fs;
 use std::path::PathBuf;
+use crate::prepare_docx::prepare_docx;
 
 #[no_mangle]
-pub extern "C" fn theme(password: *const libc::c_char, _: *const libc::c_char, nom: *const libc::c_char, date: *const libc::c_char) -> *const libc::c_char {
+pub extern "C" fn theme(password: *const libc::c_char, nom: *const libc::c_char, date: *const libc::c_char, id: libc::c_int) -> *const libc::c_char {
     use std::ffi::CStr;
     unsafe {
         let name = CStr::from_ptr(nom).to_str().unwrap_or("invalid");
@@ -28,17 +29,12 @@ pub extern "C" fn theme(password: *const libc::c_char, _: *const libc::c_char, n
         println!("Rust theme called! name={} date={}", name, date);
     }
 
-    // Convertir C string en Rust string
+    // Conversion
     let c_str = unsafe { CStr::from_ptr(password) };
     let password_str = match c_str.to_str() {
         Ok(s) => s,
         Err(_) => return std::ptr::null_mut(),
     };
-    // let c_str = unsafe { CStr::from_ptr(png) };
-    //let png_str = match c_str.to_str() {
-    //    Ok(s) => s,
-    //    Err(_) => return std::ptr::null_mut(),
-    //};
     let c_str = unsafe { CStr::from_ptr(nom) };
     let nom_str = match c_str.to_str() {
         Ok(s) => s,
@@ -49,6 +45,7 @@ pub extern "C" fn theme(password: *const libc::c_char, _: *const libc::c_char, n
         Ok(s) => s,
         Err(_) => return std::ptr::null_mut(),
     };
+    let id_u32 = id as u32;
 
     let rt = match tokio::runtime::Runtime::new() {
         Ok(r) => r,
@@ -63,44 +60,9 @@ pub extern "C" fn theme(password: *const libc::c_char, _: *const libc::c_char, n
         let auth = MultiAuth::new(password_str.to_string()).await;
         let (token_n, token_t) = auth.get_token();
 
-        let mut buf: Vec<u8> = Vec::new();
-        let client = TNumerologieClient::new(token_n.as_ref().cloned().unwrap(), token_t.as_ref().cloned().unwrap());
-        match client.get_index(1).await {
-            Ok(ok) => {
-                match general_purpose::STANDARD.decode(&ok.numerologie.png_simple_b64) {
-                    Ok(decoded) => {
-                        buf = decoded;
-                    },
-                    Err(_) => {
-                        return Err("base64 invalide pour png_simple_b64".to_string());
-                    }
-                }
-            },
-            Err(_) => {
-                return Err("Erreur de traitement".to_string());
-            },
-        }
-
-        let width = ((720f64) * 192.0 * 38.7).round() as u32;
-        let height = ((397f64) * 192.0 * 38.7).round() as u32;
-        let pic = Pic::new(&buf.as_slice()).size(width, height);
-
         // Créer un buffer avec Cursor
         let mut buffer = Cursor::new(Vec::new());
-        let docx_res = Docx::new()
-            .add_table(core_docx::titre_1("Numérologie").unwrap())
-            .add_paragraph(Paragraph::new().
-                add_run(Run::new()
-                    .add_text("")))
-            .add_table(core_docx::titre_2("Thème").unwrap())
-            .add_table(core_docx::theme_2(pic, nom_str, date_str).unwrap())
-            .add_paragraph(Paragraph::new().
-                add_run(Run::new()
-                    .add_text("")))
-            .add_table(core_docx::titre_2("Meilleur moyen pour se connecter à son intuition").unwrap())
-            //.add_table(core_docx::content_2("Le meilleur moyen...").unwrap())
-            .build()
-            .pack(&mut buffer);
+        let docx_res = prepare_docx(token_n, token_t, id_u32).await.unwrap().pack(&mut buffer);
 
         if let Err(e) = docx_res {
             error!("Erreur lors de la génération du docx : {}", e);
