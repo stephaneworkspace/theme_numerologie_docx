@@ -40,26 +40,26 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             if let Some(_) = &ok.get_all().await.ok() {
                                 numerologie = Some(ok.clone());
                             } else {
-                                println!("Aucun contenu disponible");
+                                println!("Aucun contenu disponible"); // TODO later
                             }
                         },
                         Err(_) => {
-                            println!("Aucun contenu disponible");
+                            println!("Aucun contenu disponible"); // TODO later
                             std::process::exit(1);
                         }
                     }
                 },
                 Err(e) => {
-                    eprintln!("Erreur de traitement: {}", e);
+                    eprintln!("Erreur de traitement: {}", e); // TODO later
                     std::process::exit(1);
                 },
             }
         } else {
-            eprintln!("Erreur: token_n vide");
+            eprintln!("Erreur: token_n vide"); // TODO later
             std::process::exit(1);
         }
     } else {
-        eprintln!("Erreur: token_t vide");
+        eprintln!("Erreur: token_t vide"); // TODO later
         std::process::exit(1);
     }
     //println!("{:?}", buf);
