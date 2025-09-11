@@ -320,13 +320,12 @@ impl ThemeNumerologie {
                         .unwrap_or_else(|| "".to_string());
                 }
                 TraitementNumerologie::Coi => {
-                    coi = self.coi_lame.clone().unwrap().numerologie_comportement_intime.clone();
+                    coi = self.coi_lame.clone().unwrap().numerologie_comportement_intime.clone(); // TODO
                     lame_majeure_detail = self.coi_lame.clone();
                     html = coi
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw.clone())
                         .unwrap_or_else(|| "".to_string());
-                    /*
                     html_b = coi
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw_b.clone())
@@ -334,7 +333,7 @@ impl ThemeNumerologie {
                     html_r = coi
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw_r.clone())
-                        .unwrap_or_else(|| "".to_string());*/
+                        .unwrap_or_else(|| "".to_string());
                 }
                 TraitementNumerologie::Coe => {
                     coe = self.coe_lame.clone().unwrap().numerologie_comportement_social.clone();
@@ -343,7 +342,6 @@ impl ThemeNumerologie {
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw.clone())
                         .unwrap_or_else(|| "".to_string());
-                    /*
                     html_b = coe
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw_b.clone())
@@ -351,7 +349,7 @@ impl ThemeNumerologie {
                     html_r = coe
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw_r.clone())
-                        .unwrap_or_else(|| "".to_string());*/
+                        .unwrap_or_else(|| "".to_string());
                 }
                 TraitementNumerologie::Nem => {
                     nem = self.nem_lame.clone().unwrap().numerologie_noeud_emotionnel.clone();

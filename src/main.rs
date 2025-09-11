@@ -77,9 +77,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let ppr_carte: Vec<u8> = numerologie.ppr_carte.as_slice().to_vec();
     let cai_carte: Vec<u8> = numerologie.cai_carte.as_slice().to_vec();
     let cae_carte: Vec<u8> = numerologie.cae_carte.as_slice().to_vec();
+    let coi_carte: Vec<u8> = numerologie.coi_carte.as_slice().to_vec();
+    let coe_carte: Vec<u8> = numerologie.coe_carte.as_slice().to_vec();
     let pic_ppr = Pic::new(&ppr_carte.as_slice()).size(width_carte, height_carte);
     let pic_cai = Pic::new(&cai_carte.as_slice()).size(width_carte, height_carte);
     let pic_cae = Pic::new(&cae_carte.as_slice()).size(width_carte, height_carte);
+    let pic_coi = Pic::new(&coi_carte.as_slice()).size(width_carte, height_carte);
+    let pic_coe = Pic::new(&coe_carte.as_slice()).size(width_carte, height_carte);
 
     let footer =
         Footer::new().add_paragraph(Paragraph::new().add_run(Run::new())
@@ -131,6 +135,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             numerologie.cae_html.html_r.as_str(),
             numerologie.cae_aspects.as_slice())?)
         .add_paragraph(Paragraph::new().add_run(Run::new().add_break(BreakType::Page)))
+        .add_table(core_docx::titre_2(format!("Comportement extérieur - {}", numerologie.coe_lame.unwrap().cartouche_grimaud.unwrap()).as_str())?)
+        .add_table(core_docx::content_2_trois_etape(
+            pic_coe,
+            numerologie.coe_mots_cles.as_slice(),
+            numerologie.coe_html.html.as_str(),
+            numerologie.coe_html.html_b.as_str(),
+            numerologie.coe_html.html_r.as_str(),
+            numerologie.coe_aspects.as_slice())?)
+        .add_paragraph(Paragraph::new().add_run(Run::new().add_break(BreakType::Page)))
         .add_table(core_docx::titre_2(format!("Caractère intérieur - {}", numerologie.cai_lame.unwrap().cartouche_grimaud.unwrap()).as_str())?)
         .add_table(core_docx::content_2_trois_etape(
             pic_cai,
@@ -139,6 +152,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             numerologie.cai_html.html_b.as_str(),
             numerologie.cai_html.html_r.as_str(),
             numerologie.cai_aspects.as_slice())?)
+        .add_paragraph(Paragraph::new().add_run(Run::new().add_break(BreakType::Page)))
+        .add_table(core_docx::titre_2(format!("Comportement intérieur - {}", numerologie.coi_lame.unwrap().cartouche_grimaud.unwrap()).as_str())?)
+        .add_table(core_docx::content_2_trois_etape(
+            pic_coi,
+            numerologie.coi_mots_cles.as_slice(),
+            numerologie.coi_html.html.as_str(),
+            numerologie.coi_html.html_b.as_str(),
+            numerologie.coi_html.html_r.as_str(),
+            numerologie.coi_aspects.as_slice())?)
         .add_numbering(Numbering::new(2, 2))
         .build()
         .pack(file)?;
