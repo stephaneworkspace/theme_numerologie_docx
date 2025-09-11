@@ -302,7 +302,6 @@ impl ThemeNumerologie {
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw.clone())
                         .unwrap_or_else(|| "".to_string());
-                    /*
                     html_b = cae
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw_b.clone())
@@ -310,7 +309,7 @@ impl ThemeNumerologie {
                     html_r = cae
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw_r.clone())
-                        .unwrap_or_else(|| "".to_string());*/
+                        .unwrap_or_else(|| "".to_string());
                 }
                 TraitementNumerologie::Int => {
                     int = self.int_lame.clone().unwrap().numerologie_intellect.clone();
