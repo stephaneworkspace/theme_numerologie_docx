@@ -67,9 +67,10 @@ pub extern "C" fn theme(password: *const libc::c_char, path_cartes: *const libc:
 
         // Créer un buffer avec Cursor
         let mut buffer = Cursor::new(Vec::new());
-        let docx_res = prepare_docx(token_n.clone(), token_t.clone(), id_u32, path_cartes_str.to_string()).await.unwrap().pack(&mut buffer);
+        let mut docx_res: XMLDocx = prepare_docx(token_n.clone(), token_t.clone(), id_u32, path_cartes_str.to_string()).await.unwrap();
+        let pack = docx_res.pack(&mut buffer);
 
-        if let Err(e) = docx_res {
+        if let Err(e) = pack {
             error!("Erreur lors de la génération du docx : {}", e);
             return Err(format!("Erreur docx: {}", e));
         }
