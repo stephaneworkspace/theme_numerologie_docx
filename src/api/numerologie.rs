@@ -394,7 +394,6 @@ impl ThemeNumerologie {
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw.clone())
                         .unwrap_or_else(|| "".to_string());
-                    /*
                     html_b = ppr
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw_b.clone())
@@ -402,7 +401,7 @@ impl ThemeNumerologie {
                     html_r = ppr
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw_r.clone())
-                        .unwrap_or_else(|| "".to_string());*/
+                        .unwrap_or_else(|| "".to_string());
                 }
             }
             let mut aspects_b: Vec<String> = vec![];
