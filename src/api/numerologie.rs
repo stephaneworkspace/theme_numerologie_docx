@@ -1,6 +1,7 @@
+use std::fs;
 use serde::Deserialize;
 use reqwest::{Client, Response};
-use crate::api::{LameMajeureDetail, NumerologieCaractereIntime, NumerologieCaractereSocial, NumerologieComportementIntime, NumerologieComportementSocial, NumerologieIntellect, NumerologieNoeudEmotionnel, NumerologiePersonaliteExterieure, NumerologiePersonaliteProfonde};
+use crate::api::{LameMajeureDetail, NumerologieCaractereIntime, NumerologieCaractereSocial, NumerologieComportementIntime, NumerologieComportementSocial, NumerologieIntellect, NumerologieMotCle, NumerologieNoeudEmotionnel, NumerologiePersonaliteExterieure, NumerologiePersonaliteProfonde};
 use crate::core_docx::{ColorEnum, NumerologieAspects};
 use crate::html_tools::extract_supers_and_bold_and_italic;
 use strum::IntoEnumIterator;
@@ -14,33 +15,41 @@ pub struct ThemeNumerologie {
     path_cartes: String,
     pub cai_lame: Option<LameMajeureDetail>,
     pub cai_mots_cles: Vec<(ColorEnum, String)>,
+    pub cai_carte: Vec<u8>,
     pub cai_html: HtmlNBR,
     pub cai_aspects: Vec<NumerologieAspects>,
     pub cae_lame: Option<LameMajeureDetail>,
     pub cae_mots_cles: Vec<(ColorEnum, String)>,
+    pub cae_carte: Vec<u8>,
     pub cae_html: HtmlNBR,
     pub cae_aspects: Vec<NumerologieAspects>,
     pub int_lame: Option<LameMajeureDetail>,
     pub int_mots_cles: Vec<(ColorEnum, String)>,
+    pub int_carte: Vec<u8>,
     pub int_html: String,
     pub coi_lame: Option<LameMajeureDetail>,
     pub coi_mots_cles: Vec<(ColorEnum, String)>,
+    pub coi_carte: Vec<u8>,
     pub coi_html: HtmlNBR,
     pub coi_aspects: Vec<NumerologieAspects>,
     pub coe_lame: Option<LameMajeureDetail>,
     pub coe_mots_cles: Vec<(ColorEnum, String)>,
+    pub coe_carte: Vec<u8>,
     pub coe_html: HtmlNBR,
     pub coe_aspects: Vec<NumerologieAspects>,
     pub nem_lame: Option<LameMajeureDetail>,
     pub nem_mots_cles: Vec<(ColorEnum, String)>,
+    pub nem_carte: Vec<u8>,
     pub nem_html: HtmlNBR,
     pub nem_aspects: Vec<NumerologieAspects>,
     pub pex_lame: Option<LameMajeureDetail>,
     pub pex_mots_cles: Vec<(ColorEnum, String)>,
+    pub pex_carte: Vec<u8>,
     pub pex_html: HtmlNBR,
     pub pex_aspects: Vec<NumerologieAspects>,
     pub ppr_lame: Option<LameMajeureDetail>,
     pub ppr_mots_cles: Vec<(ColorEnum, String)>,
+    pub ppr_carte: Vec<u8>,
     pub ppr_html: HtmlNBR,
     pub ppr_aspects: Vec<NumerologieAspects>,
 }
@@ -82,6 +91,7 @@ impl ThemeNumerologie {
             path_cartes: "/Users/stephane/Code/rust/ref/theme_numerologie_docx/images/TAROT-GRIMAUD".to_string(), // TODO later
             cai_lame: None,
             cai_mots_cles: vec![],
+            cai_carte: vec![],
             cai_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
@@ -90,6 +100,7 @@ impl ThemeNumerologie {
             cai_aspects: vec![],
             cae_lame: None,
             cae_mots_cles: vec![],
+            cae_carte: vec![],
             cae_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
@@ -98,9 +109,11 @@ impl ThemeNumerologie {
             cae_aspects: vec![],
             int_lame: None,
             int_mots_cles: vec![],
+            int_carte: vec![],
             int_html: "".to_string(),
             coi_lame: None,
             coi_mots_cles: vec![],
+            coi_carte: vec![],
             coi_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
@@ -109,6 +122,7 @@ impl ThemeNumerologie {
             coi_aspects: vec![],
             coe_lame: None,
             coe_mots_cles: vec![],
+            coe_carte: vec![],
             coe_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
@@ -117,6 +131,7 @@ impl ThemeNumerologie {
             coe_aspects: vec![],
             nem_lame: None,
             nem_mots_cles: vec![],
+            nem_carte: vec![],
             nem_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
@@ -125,6 +140,7 @@ impl ThemeNumerologie {
             nem_aspects: vec![],
             pex_lame: None,
             pex_mots_cles: vec![],
+            pex_carte: vec![],
             pex_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
@@ -133,6 +149,7 @@ impl ThemeNumerologie {
             pex_aspects: vec![],
             ppr_lame: None,
             ppr_mots_cles: vec![],
+            ppr_carte: vec![],
             ppr_html: HtmlNBR {
                 html: "".to_string(),
                 html_b: "".to_string(),
@@ -237,10 +254,11 @@ impl ThemeNumerologie {
         Ok(())
     }
 
-    pub async fn get_carte(&self, id: i32) -> Result<Vec<u8>, std::io::Error> {
+    fn get_carte(&self, id: i32) -> Result<Vec<u8>, String> {
+        //std::io::Error> {
         let file_name = format!("{}.jpg", id);
         let path = std::path::Path::new(&self.path_cartes).join(file_name);
-        let data = tokio::fs::read(path).await?;
+        let data = fs::read(path).unwrap(); // TODO ?
         Ok(data)
     }
 
@@ -404,8 +422,8 @@ impl ThemeNumerologie {
             (html, _) = extract_supers_and_bold_and_italic(html.as_str());
             (html_b, aspects_b) = extract_supers_and_bold_and_italic(html_b.as_str());
             (html_r, aspects_r) = extract_supers_and_bold_and_italic(html_r.as_str());
-            let mut traitement = vec![];
-            traitement = aspects_b.into_iter().map(|x| {
+            let mut traitement_aspects = vec![];
+            traitement_aspects = aspects_b.into_iter().map(|x| {
                 let mut find = false;
                 for y in bold_aspects.as_slice().iter() {
                     if x == *y {
@@ -419,7 +437,7 @@ impl ThemeNumerologie {
                     sw_bold: find,
                 }
             }).collect();
-            traitement.extend(
+            traitement_aspects.extend(
                 aspects_r
                     .into_iter()
                     .map(|x| {
@@ -433,147 +451,146 @@ impl ThemeNumerologie {
             );
             match x.clone() {
                 TraitementNumerologie::Cai => {
-                    self.cai_mots_cles = self.cai_lame.clone().unwrap().numerologie_mots_cle.as_slice()
-                        .iter()
-                        .map(|x| {
-                            if (x.polarite == Some("+".to_string())) {
-                                (ColorEnum::Bleu, x.mot_cle.clone())
-                            } else {
-                                (ColorEnum::Rouge, x.mot_cle.clone())
-                            }
-                        })
-                        .collect();
-                    self.cai_html = HtmlNBR {
+                    let (mots_cles, html_struct) = traiter_lame(
+                        &self.cai_lame,
+                        |id| self.get_carte(id),
                         html,
                         html_b,
                         html_r,
-                    };
-                    self.cai_aspects = traitement;
+                    );
+                    self.cai_mots_cles = mots_cles;
+                    self.cai_carte = self.get_carte(self.cai_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.cai_html = html_struct;
+                    self.cai_aspects = traitement_aspects;
                 }
                 TraitementNumerologie::Cae => {
-                    self.cae_mots_cles = self.cae_lame.clone().unwrap().numerologie_mots_cle.as_slice()
-                        .iter()
-                        .map(|x| {
-                            if (x.polarite == Some("+".to_string())) {
-                                (ColorEnum::Bleu, x.mot_cle.clone())
-                            } else {
-                                (ColorEnum::Rouge, x.mot_cle.clone())
-                            }
-                        })
-                        .collect();
-                    self.cae_html = HtmlNBR {
+                    let (mots_cles, html_struct) = traiter_lame(
+                        &self.cae_lame,
+                        |id| self.get_carte(id),
                         html,
                         html_b,
                         html_r,
-                    };
-                    self.cae_aspects = traitement;
+                    );
+                    self.cae_mots_cles = mots_cles;
+                    self.cae_carte = self.get_carte(self.cae_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.cae_html = html_struct;
+                    self.cae_aspects = traitement_aspects;
                 }
                 TraitementNumerologie::Int => {
-                    self.int_mots_cles = self.int_lame.clone().unwrap().numerologie_mots_cle.as_slice()
-                        .iter()
-                        .map(|x| {
-                            if (x.polarite == Some("+".to_string())) {
-                                (ColorEnum::Bleu, x.mot_cle.clone())
-                            } else {
-                                (ColorEnum::Rouge, x.mot_cle.clone())
-                            }
-                        })
-                        .collect();
-                    self.int_html = html;
+                    let (mots_cles, html_struct) = traiter_lame(
+                        &self.int_lame,
+                        |id| self.get_carte(id),
+                        html,
+                        html_b,
+                        html_r,
+                    );
+                    self.int_mots_cles = mots_cles;
+                    self.int_carte = self.get_carte(self.int_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.int_html = html_struct.html;
                 }
                 TraitementNumerologie::Coi => {
-                    self.coi_mots_cles = self.coi_lame.clone().unwrap().numerologie_mots_cle.as_slice()
-                        .iter()
-                        .map(|x| {
-                            if (x.polarite == Some("+".to_string())) {
-                                (ColorEnum::Bleu, x.mot_cle.clone())
-                            } else {
-                                (ColorEnum::Rouge, x.mot_cle.clone())
-                            }
-                        })
-                        .collect();
-                    self.coi_html = HtmlNBR {
+                    let (mots_cles, html_struct) = traiter_lame(
+                        &self.coi_lame,
+                        |id| self.get_carte(id),
                         html,
                         html_b,
                         html_r,
-                    };
-                    self.coi_aspects = traitement;
+                    );
+                    self.coi_mots_cles = mots_cles;
+                    self.coi_carte = self.get_carte(self.coi_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.coi_html = html_struct;
+                    self.coi_aspects = traitement_aspects;
                 }
                 TraitementNumerologie::Coe => {
-                    self.coe_mots_cles = self.coe_lame.clone().unwrap().numerologie_mots_cle.as_slice()
-                        .iter()
-                        .map(|x| {
-                            if (x.polarite == Some("+".to_string())) {
-                                (ColorEnum::Bleu, x.mot_cle.clone())
-                            } else {
-                                (ColorEnum::Rouge, x.mot_cle.clone())
-                            }
-                        })
-                        .collect();
-                    self.coe_html = HtmlNBR {
+                    let (mots_cles, html_struct) = traiter_lame(
+                        &self.coe_lame,
+                        |id| self.get_carte(id),
                         html,
                         html_b,
                         html_r,
-                    };
-                    self.coe_aspects = traitement;
+                    );
+                    self.coe_mots_cles = mots_cles;
+                    self.coe_carte = self.get_carte(self.coe_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.coe_html = html_struct;
+                    self.coe_aspects = traitement_aspects;
                 }
                 TraitementNumerologie::Nem => {
-                    self.nem_mots_cles = self.nem_lame.clone().unwrap().numerologie_mots_cle.as_slice()
-                        .iter()
-                        .map(|x| {
-                            if (x.polarite == Some("+".to_string())) {
-                                (ColorEnum::Bleu, x.mot_cle.clone())
-                            } else {
-                                (ColorEnum::Rouge, x.mot_cle.clone())
-                            }
-                        })
-                        .collect();
-                    self.nem_html = HtmlNBR {
+                    let (mots_cles, html_struct) = traiter_lame(
+                        &self.nem_lame,
+                        |id| self.get_carte(id),
                         html,
                         html_b,
                         html_r,
-                    };
-                    self.nem_aspects = traitement;
+                    );
+                    self.nem_mots_cles = mots_cles;
+                    self.nem_carte = self.get_carte(self.nem_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.nem_html = html_struct;
+                    self.nem_aspects = traitement_aspects;
                 }
                 TraitementNumerologie::Pex => {
-                    self.pex_mots_cles = self.pex_lame.clone().unwrap().numerologie_mots_cle.as_slice()
-                        .iter()
-                        .map(|x| {
-                            if (x.polarite == Some("+".to_string())) {
-                                (ColorEnum::Bleu, x.mot_cle.clone())
-                            } else {
-                                (ColorEnum::Rouge, x.mot_cle.clone())
-                            }
-                        })
-                        .collect();
-                    self.pex_html = HtmlNBR {
+                    let (mots_cles, html_struct) = traiter_lame(
+                        &self.pex_lame,
+                        |id| self.get_carte(id),
                         html,
                         html_b,
                         html_r,
-                    };
-                    self.pex_aspects = traitement;
+                    );
+                    self.pex_mots_cles = mots_cles;
+                    self.pex_carte = self.get_carte(self.pex_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.pex_html = html_struct;
+                    self.pex_aspects = traitement_aspects;
                 }
                 TraitementNumerologie::Ppr => {
-                    self.ppr_mots_cles = self.ppr_lame.clone().unwrap().numerologie_mots_cle.as_slice()
-                        .iter()
-                        .map(|x| {
-                            if (x.polarite == Some("+".to_string())) {
-                                (ColorEnum::Bleu, x.mot_cle.clone())
-                            } else {
-                                (ColorEnum::Rouge, x.mot_cle.clone())
-                            }
-                        })
-                        .collect();
-                    self.ppr_html = HtmlNBR {
+                    let (mots_cles, html_struct) = traiter_lame(
+                        &self.ppr_lame,
+                        |id| self.get_carte(id),
                         html,
                         html_b,
                         html_r,
-                    };
-                    self.ppr_aspects = traitement;
+                    );
+                    self.ppr_mots_cles = mots_cles;
+                    self.ppr_carte = self.get_carte(self.pex_lame.as_ref().unwrap().id as i32).unwrap(); // TODO intercepté le error IO
+                    self.ppr_html = html_struct;
+                    self.ppr_aspects = traitement_aspects;
                 }
             }
         });
     }
+}
+
+fn transformer_mots_cles(mots: &[NumerologieMotCle]) -> Vec<(ColorEnum, String)> {
+    mots.iter()
+        .map(|x| {
+            let couleur = if x.polarite.as_deref() == Some("+") {
+                ColorEnum::Bleu
+            } else {
+                ColorEnum::Rouge
+            };
+            (couleur, x.mot_cle.clone())
+        })
+        .collect()
+}
+
+fn traiter_lame(
+    lame: &Option<LameMajeureDetail>,
+    get_carte: impl Fn(i32) -> Result<Vec<u8>, String>,
+    html: String,
+    html_b: String,
+    html_r: String,
+) -> (Vec<(ColorEnum, String)>, HtmlNBR) {
+    let mots_cles = transformer_mots_cles(&lame.as_ref().unwrap().numerologie_mots_cle);
+
+    let carte = match get_carte(lame.as_ref().unwrap().id as i32) {
+        Ok(vu8) => vu8,
+        Err(e) => {
+            eprintln!("Erreur de traitement sur la carte: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    let html_struct = HtmlNBR { html, html_b, html_r };
+
+    (mots_cles, html_struct)
 }
 
 #[derive(Debug, Deserialize, Clone)]

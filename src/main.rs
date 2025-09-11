@@ -53,15 +53,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             if let Some(_) = &ok.get_all().await.ok() {
                                 cai_mots_cles = ok.cai_mots_cles.as_slice().to_vec();
                                 cai_cartouche = ok.cai_lame.clone().unwrap().cartouche_grimaud.unwrap().to_string();
-                                match ok.get_carte(ok.cai_lame.clone().unwrap().id as i32).await {
-                                    Ok(cai_carte_vu8) => {
-                                        cai_carte = cai_carte_vu8;
-                                    },
-                                    Err(e) => {
-                                        eprintln!("Erreur de traitement sur la carte: {}", e);
-                                        std::process::exit(1);
-                                    },
-                                }
+                                cai_carte = ok.cai_carte.as_slice().to_vec();
                                 cai_aspects = ok.cai_aspects.as_slice().to_vec();
                                 cai = ok.cai_html.html;
                                 cai_b = ok.cai_html.html_b;
