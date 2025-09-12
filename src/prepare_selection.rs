@@ -2,7 +2,7 @@ use std::io::ErrorKind;
 use base64::Engine;
 use base64::engine::general_purpose;
 use docx_rs::{AbstractNumbering, BreakType, Comment, Docx, Footer, Level, LevelJc, LevelText, NumberFormat, Numbering, PageNum, Paragraph, Pic, Run, SpecialIndentType, Start, XMLDocx};
-use crate::api::{TNumerologieClient, ThemeNumerologie};
+use crate::api::{TNumerologieClient, ThemeNumerologie, TraitSelectionNumerologie};
 use crate::core_docx;
 use crate::api::numerologie::TraitementNumerologie;
 

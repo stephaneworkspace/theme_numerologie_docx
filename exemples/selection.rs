@@ -1,5 +1,6 @@
 use std::env;
-use theme_numerologie_docx::api::TraitementNumerologie;
+use theme_numerologie_docx::api::{Numerologie, ThemeNumerologie, TraitementNumerologie};
+use theme_numerologie_docx::api::numerologie::HtmlNBR;
 use theme_numerologie_docx::MultiAuth;
 use theme_numerologie_docx::password;
 use theme_numerologie_docx::prepare_selection::prepare_selection;
@@ -23,4 +24,3 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     prepare_selection(token_n, token_t, id, traitement).await?;
     Ok(())
 }
-
