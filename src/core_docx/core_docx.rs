@@ -144,12 +144,12 @@ pub fn content_2(content: &str, color: ColorEnum) -> Result<Table, Box<dyn std::
 }
 
 pub fn content_2_trois_etape(pic: Pic,
-                             mots_cle: &[(ColorEnum, String)],
+                             _: &[(ColorEnum, String)],
                              content: &str,
                              content_b: &str,
                              content_r: &str,
                              aspects: &[NumerologieAspects]) -> Result<Table, Box<dyn std::error::Error>> {
-    let p_mot_cles= paragraphs_mots_cle(mots_cle);
+    //let p_mot_cles = paragraphs_mots_cle(mots_cle);
     let bbb: Vec<NumerologieAspects> = aspects.iter().filter(|x| x.color == ColorEnum::Bleu).map(|x| x.clone()).collect();
     let rrr: Vec<NumerologieAspects> = aspects.iter().filter(|x| x.color == ColorEnum::Rouge).map(|x| x.clone()).collect();
 
@@ -174,9 +174,9 @@ pub fn content_2_trois_etape(pic: Pic,
     )
         .align(AlignmentType::Left)
     ).clear_all_border().width(2600, WidthType::Dxa);
-    for x in p_mot_cles {
-        tc = tc.add_paragraph(x);
-    }
+    //for x in p_mot_cles {
+    //    tc = tc.add_paragraph(x);
+    //}
 
     let mut tc_2 = TableCell::new();
     tc_2 = tc_2
@@ -187,7 +187,7 @@ pub fn content_2_trois_etape(pic: Pic,
         .add_paragraph(p_rouge)
         .clear_all_border()
         .width(6000, WidthType::Dxa);
-    if aspects_b.len() > 0 {
+    /*if aspects_b.len() > 0 {
         tc_2 = tc_2.add_paragraph(Paragraph::new().add_run(Run::new().add_text(empty)));
     }
     for x in aspects_b {
@@ -198,7 +198,7 @@ pub fn content_2_trois_etape(pic: Pic,
     }
     for x in aspects_r {
         tc_2 = tc_2.add_paragraph(x);
-    }
+    }*/
 
     let table = Table::new(vec![
         TableRow::new(vec![
