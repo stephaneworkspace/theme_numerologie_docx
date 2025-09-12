@@ -7,14 +7,19 @@ c'est pour du traitement :
 Html -> Balise spécial -> SwiftUi
  */
 use reqwest::{Client, Response};
-use crate::api::{Numerologie, ThemeNumerologie};
+use crate::api::{LameMajeureDetail, Numerologie, ThemeNumerologie, TraitementNumerologie};
 use crate::api::numerologie::HtmlNBR;
+use crate::html_tools::extract_supers_and_bold_and_italic;
 use crate::TNumerologieClient;
 
 pub trait TraitSelectionThemeNumerologie {
     fn new_sans_cartes(numerologie: Numerologie, token: String) -> Self
     where
         Self: Sized;
+    fn get_traitement(
+        &self,
+        traitement: TraitementNumerologie
+    ) -> impl std::future::Future<Output = Result<(()), reqwest::Error>> + Send;
 }
 
 pub trait TraitSelectionNumerologie {
@@ -127,4 +132,95 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
             ppr_aspects: vec![],
         }
     }
+    async fn get_traitement(&self, traitement: TraitementNumerologie) -> Result<(()), reqwest::Error> {
+        let carte: u32 = match &traitement  {
+            TraitementNumerologie::Cai => {
+                self.numerologie.interpretation_cai
+            },
+            TraitementNumerologie::Cae => {
+                self.numerologie.interpretation_cae
+            }
+            TraitementNumerologie::Int => {
+                self.numerologie.interpretation_int
+            }
+            TraitementNumerologie::Coi => {
+                self.numerologie.interpretation_coi
+            }
+            TraitementNumerologie::Coe => {
+                self.numerologie.interpretation_coe
+            }
+            TraitementNumerologie::Nem => {
+                self.numerologie.interpretation_nem
+            }
+            TraitementNumerologie::Pex => {
+                self.numerologie.interpretation_pex
+            }
+            TraitementNumerologie::Ppr => {
+                self.numerologie.interpretation_ppr
+            }
+        };
+        let url = format!("{}/api/lame_majeures/{}", self.base_url, carte);
+        let client = Client::new();
+        let resp: Response =
+            client
+                .get(&url)
+                .bearer_auth(&self.token)
+                .send()
+                .await?
+                .error_for_status()?;
+        let lame: Option<LameMajeureDetail> = match &traitement {
+            TraitementNumerologie::Cai => {
+                Some(resp.json().await?)
+            }
+            TraitementNumerologie::Cae => {
+                Some(resp.json().await?)
+            }
+            TraitementNumerologie::Int => {
+                Some(resp.json().await?)
+            }
+            TraitementNumerologie::Coi => {
+                Some(resp.json().await?)
+            }
+            TraitementNumerologie::Coe => {
+                Some(resp.json().await?)
+            }
+            TraitementNumerologie::Nem => {
+                Some(resp.json().await?)
+            }
+            TraitementNumerologie::Pex => {
+                Some(resp.json().await?)
+            }
+            TraitementNumerologie::Ppr => {
+                Some(resp.json().await?)
+            }
+        };
+        let l = &lame.unwrap();
+        let lt = &l.numerologie_caractere_intime;
+        let (html_lame, html_lame_b, html_lame_r) = match &traitement {
+            TraitementNumerologie::Cai
+            | TraitementNumerologie::Cae
+            | TraitementNumerologie::Coi
+            | TraitementNumerologie::Coe
+            | TraitementNumerologie::Nem
+            | TraitementNumerologie::Pex
+            | TraitementNumerologie::Ppr => {
+                (lt.as_ref().unwrap().html_body_one_note_raw.clone(),
+                 lt.as_ref().unwrap().html_body_one_note_raw_b.clone(),
+                 lt.as_ref().unwrap().html_body_one_note_raw_r.clone())
+            },
+            TraitementNumerologie::Int => {
+                (lt.as_ref().unwrap().html_body_one_note_raw.clone(),
+                 "".to_string(),
+                 "".to_string())
+            }
+        };
+        let res = extract_supers_and_bold_and_italic(html_lame.as_str());
+        let res_b = extract_supers_and_bold_and_italic(html_lame_b.as_str());
+        let res_r = extract_supers_and_bold_and_italic(html_lame_r.as_str());
+        println!("{}",res.0);
+        println!("{} {:?}",res_b.0, res_b.1);
+        println!("{} {:?}",res_r.0, res_r.1);
+        Ok(())
+    }
+
 }

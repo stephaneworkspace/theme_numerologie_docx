@@ -1,5 +1,5 @@
 use std::io::ErrorKind;
-use crate::api::{TNumerologieClient, ThemeNumerologie, TraitSelectionNumerologie};
+use crate::api::{TNumerologieClient, ThemeNumerologie, TraitSelectionNumerologie, TraitSelectionThemeNumerologie};
 use crate::api::numerologie::TraitementNumerologie;
 
 pub async fn prepare_selection(token_n: Option<String>, token_t: Option<String>, id: u32, traitement: TraitementNumerologie) -> Result<(), Box<dyn std::error::Error>> {

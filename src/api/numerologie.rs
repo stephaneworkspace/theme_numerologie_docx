@@ -187,7 +187,6 @@ impl ThemeNumerologie {
         }
     }*/
 
-    /// Calcul du tout pour traitement docx-rs
     pub async fn get_all(&mut self) -> Result<(()), reqwest::Error> {
         for x in TraitementNumerologie::iter() {
             let carte: u32 = match &x  {
@@ -253,100 +252,6 @@ impl ThemeNumerologie {
             }
         }
         self.compute_html_and_aspect_data();
-        Ok(())
-    }
-
-    /// Traitement pour selection pour text pure rust pour Swift
-    pub async fn get_traitement(&self, traitement: TraitementNumerologie) -> Result<(()), reqwest::Error> {
-        let carte: u32 = match &traitement  {
-            TraitementNumerologie::Cai => {
-                self.numerologie.interpretation_cai
-            },
-            TraitementNumerologie::Cae => {
-                self.numerologie.interpretation_cae
-            }
-            TraitementNumerologie::Int => {
-                self.numerologie.interpretation_int
-            }
-            TraitementNumerologie::Coi => {
-                self.numerologie.interpretation_coi
-            }
-            TraitementNumerologie::Coe => {
-                self.numerologie.interpretation_coe
-            }
-            TraitementNumerologie::Nem => {
-                self.numerologie.interpretation_nem
-            }
-            TraitementNumerologie::Pex => {
-                self.numerologie.interpretation_pex
-            }
-            TraitementNumerologie::Ppr => {
-                self.numerologie.interpretation_ppr
-            }
-        };
-        let url = format!("{}/api/lame_majeures/{}", self.base_url, carte);
-        let client = Client::new();
-        let resp: Response =
-            client
-                .get(&url)
-                .bearer_auth(&self.token)
-                .send()
-                .await?
-                .error_for_status()?;
-        let lame: Option<LameMajeureDetail> = match &traitement {
-            TraitementNumerologie::Cai => {
-                Some(resp.json().await?)
-            }
-            TraitementNumerologie::Cae => {
-                Some(resp.json().await?)
-            }
-            TraitementNumerologie::Int => {
-                Some(resp.json().await?)
-            }
-            TraitementNumerologie::Coi => {
-                Some(resp.json().await?)
-            }
-            TraitementNumerologie::Coe => {
-                Some(resp.json().await?)
-            }
-            TraitementNumerologie::Nem => {
-                Some(resp.json().await?)
-            }
-            TraitementNumerologie::Pex => {
-                Some(resp.json().await?)
-            }
-            TraitementNumerologie::Ppr => {
-                Some(resp.json().await?)
-            }
-        };
-        let html_lame: String = match &traitement {
-            TraitementNumerologie::Cai => {
-                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
-            }
-            TraitementNumerologie::Cae => {
-                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
-            }
-            TraitementNumerologie::Int => {
-                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
-            }
-            TraitementNumerologie::Coi => {
-                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
-            }
-            TraitementNumerologie::Coe => {
-                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
-            }
-            TraitementNumerologie::Nem => {
-                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
-            }
-            TraitementNumerologie::Pex => {
-                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
-            }
-            TraitementNumerologie::Ppr => {
-                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
-            }
-        };
-        let res = extract_supers_and_bold_and_italic(html_lame.as_str());
-        println!("{}",res.0);
         Ok(())
     }
 
