@@ -230,27 +230,28 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
             .collect();
 
         let mut traitement_aspects: Vec<NumerologieAspects> = vec![];
-        traitement_aspects = res_b.1.into_iter().map(|x| {
+        traitement_aspects = res_b.1.as_slice().into_iter().map(|x| {
             let mut find = false;
             for y in bold_aspects.as_slice().iter() {
-                if x == *y {
+                if x == y {
                     find = true;
                     break;
                 }
             }
             NumerologieAspects {
-                aspect: x,
+                aspect: x.to_string(),
                 color: ColorEnum::Bleu,
                 sw_bold: find,
             }
         }).collect();
         traitement_aspects.extend(
             res_r.1
+                .as_slice()
                 .into_iter()
                 .map(|x| {
-                    let sw_bold = bold_aspects.iter().any(|y| x == *y);
+                    let sw_bold = bold_aspects.iter().any(|y| x == y);
                     NumerologieAspects {
-                        aspect: x,
+                        aspect: x.to_string(),
                         color: ColorEnum::Rouge,
                         sw_bold,
                     }
@@ -258,8 +259,8 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
         );
 
         println!("{}",res.0);
-        println!("{} {:?}",res_b.0, "res_b.1");
-        println!("{} {:?}",res_r.0, "res_r.1");
+        println!("{} {:?}",res_b.0, res_b.1);
+        println!("{} {:?}",res_r.0, res_r.1);
         println!("{:?}",traitement_aspects);
         Ok(())
     }
