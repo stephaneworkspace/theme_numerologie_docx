@@ -21,7 +21,10 @@ pub trait TraitSelectionNumerologie {
     fn new_sans_cartes(token_n: String, token_t: String) -> Self
     where
         Self: Sized;
-    async fn get_index_sans_cartes(&self, id: u32) -> Result<ThemeNumerologie, reqwest::Error>;
+    fn get_index_sans_cartes(
+        &self,
+        id: u32,
+    ) -> impl std::future::Future<Output = Result<ThemeNumerologie, reqwest::Error>> + Send;
 }
 impl TraitSelectionNumerologie for TNumerologieClient {
     fn new_sans_cartes(token_n: String, token_t: String) -> Self {
