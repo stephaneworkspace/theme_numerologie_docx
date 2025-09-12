@@ -15,7 +15,7 @@ pub fn clean_html(html: &String) -> String {
     plain_text.replace("\n", " ").replace("\r", " ").split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
-pub fn extract_supers_and_bold_and_italic(html: &str) -> (String, Vec<String>) {
+pub fn extract_supers_and_bold_and_italic(html: &str, sw_remove_super: bool) -> (String, Vec<String>) {
     let mut vec: Vec<String> = vec![];
     let document = Html::parse_fragment(html);
 
@@ -93,6 +93,25 @@ pub fn extract_supers_and_bold_and_italic(html: &str) -> (String, Vec<String>) {
         })
         .collect();
 
+    if sw_remove_super {
+        // Supprimer tout le contenu entouré par ###...###, puis normaliser les espaces et retourner
+        let re_marked = Regex::new(r"(?s)###.*?###").unwrap();
+        let cleaned_no_super = re_marked.replace_all(&cleaned, "").to_string();
+        let cleaned_no_super = cleaned_no_super
+            .split_whitespace()
+            .collect::<Vec<_>>()
+            .join(" ");
+        return (cleaned_no_super, vec);
+    } else {
+        // Dé-entoiler les parenthèses à l'intérieur des balises super: "###(mot)###" -> "###mot###"
+        let re_unwrap = Regex::new(r"###\(\s*(.*?)\s*\)###").unwrap();
+        let tmp = re_unwrap.replace_all(&cleaned, "###$1###").to_string();
+
+        // Normalisation des espaces identique au retour standard
+        let tmp = tmp.split_whitespace().collect::<Vec<_>>().join(" ");
+        return (tmp, vec);
+
+    }
     // Normalisation des espaces
-    (cleaned.split_whitespace().collect::<Vec<_>>().join(" "), vec)
+    //(cleaned.split_whitespace().collect::<Vec<_>>().join(" "), vec)
 }

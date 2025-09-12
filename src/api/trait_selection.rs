@@ -9,6 +9,7 @@ Html -> Balise spécial -> SwiftUi
 use reqwest::{Client, Response};
 use crate::api::{LameMajeureDetail, Numerologie, ThemeNumerologie, TraitementNumerologie};
 use crate::api::numerologie::HtmlNBR;
+use crate::core_docx::{ColorEnum, NumerologieAspects};
 use crate::html_tools::extract_supers_and_bold_and_italic;
 use crate::TNumerologieClient;
 
@@ -214,12 +215,52 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                  "".to_string())
             }
         };
-        let res = extract_supers_and_bold_and_italic(html_lame.as_str());
-        let res_b = extract_supers_and_bold_and_italic(html_lame_b.as_str());
-        let res_r = extract_supers_and_bold_and_italic(html_lame_r.as_str());
+        let res = extract_supers_and_bold_and_italic(html_lame.as_str(), false);
+        let res_b = extract_supers_and_bold_and_italic(html_lame_b.as_str(), false);
+        let res_r = extract_supers_and_bold_and_italic(html_lame_r.as_str(), false);
+        let mut bold_aspects: Vec<String> = vec![];
+        bold_aspects = l.clone().numerologie_aspects.as_slice()
+            .iter()
+            .filter(|x| {
+                x.sw_bold && x.nom.clone().is_some()
+            })
+            .map(|x| {
+                x.nom.clone().unwrap()
+            })
+            .collect();
+
+        let mut traitement_aspects: Vec<NumerologieAspects> = vec![];
+        traitement_aspects = res_b.1.into_iter().map(|x| {
+            let mut find = false;
+            for y in bold_aspects.as_slice().iter() {
+                if x == *y {
+                    find = true;
+                    break;
+                }
+            }
+            NumerologieAspects {
+                aspect: x,
+                color: ColorEnum::Bleu,
+                sw_bold: find,
+            }
+        }).collect();
+        traitement_aspects.extend(
+            res_r.1
+                .into_iter()
+                .map(|x| {
+                    let sw_bold = bold_aspects.iter().any(|y| x == *y);
+                    NumerologieAspects {
+                        aspect: x,
+                        color: ColorEnum::Rouge,
+                        sw_bold,
+                    }
+                })
+        );
+
         println!("{}",res.0);
-        println!("{} {:?}",res_b.0, res_b.1);
-        println!("{} {:?}",res_r.0, res_r.1);
+        println!("{} {:?}",res_b.0, "res_b.1");
+        println!("{} {:?}",res_r.0, "res_r.1");
+        println!("{:?}",traitement_aspects);
         Ok(())
     }
 

@@ -416,9 +416,9 @@ impl ThemeNumerologie {
                     x.nom.clone().unwrap()
                 })
                 .collect();
-            (html, _) = extract_supers_and_bold_and_italic(html.as_str());
-            (html_b, aspects_b) = extract_supers_and_bold_and_italic(html_b.as_str());
-            (html_r, aspects_r) = extract_supers_and_bold_and_italic(html_r.as_str());
+            (html, _) = extract_supers_and_bold_and_italic(html.as_str(), true);
+            (html_b, aspects_b) = extract_supers_and_bold_and_italic(html_b.as_str(), true);
+            (html_r, aspects_r) = extract_supers_and_bold_and_italic(html_r.as_str(), true);
             let mut traitement_aspects = vec![];
             traitement_aspects = aspects_b.into_iter().map(|x| {
                 let mut find = false;
