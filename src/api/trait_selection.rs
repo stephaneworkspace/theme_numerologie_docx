@@ -1,3 +1,11 @@
+/*
+Trait pour un traitement dans exemples/selection.rs
+---------------------------------------------------
+Cet exemple permet de faire des traitements de texte
+Donc rien avoir avec le nom original de ce crate,
+c'est pour du traitement :
+Html -> Balise spécial -> SwiftUi
+ */
 use reqwest::{Client, Response};
 use crate::api::{Numerologie, ThemeNumerologie};
 use crate::api::numerologie::HtmlNBR;
