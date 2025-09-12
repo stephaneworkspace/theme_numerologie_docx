@@ -1,14 +1,14 @@
 extern crate core;
 
 mod core_docx;
-mod api;
-mod password;
+pub mod api;
+pub mod password;
 pub mod html_tools;
 mod prepare_docx;
 
 // mod tools;
 use docx_rs::*;
-use crate::api::{MultiAuth, TNumerologieClient};
+pub use crate::api::{MultiAuth, TNumerologieClient};
 use std::ffi::CString;
 use std::io::{Cursor, Read};
 use base64::engine::general_purpose;
