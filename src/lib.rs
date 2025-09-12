@@ -5,6 +5,7 @@ pub mod api;
 pub mod password;
 pub mod html_tools;
 mod prepare_docx;
+pub mod prepare_selection;
 
 // mod tools;
 use docx_rs::*;

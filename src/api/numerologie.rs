@@ -186,32 +186,109 @@ impl ThemeNumerologie {
         }
     }*/
 
+    pub fn new_sans_cartes(numerologie: Numerologie, token: String) -> Self {
+        Self {
+            base_url: "https://numerologie.bressani.dev:1122".to_string(),
+            numerologie,
+            token,
+            path_cartes: "".to_string(),
+            cai_lame: None,
+            cai_mots_cles: vec![],
+            cai_carte: vec![],
+            cai_html: HtmlNBR {
+                html: "".to_string(),
+                html_b: "".to_string(),
+                html_r: "".to_string(),
+            },
+            cai_aspects: vec![],
+            cae_lame: None,
+            cae_mots_cles: vec![],
+            cae_carte: vec![],
+            cae_html: HtmlNBR {
+                html: "".to_string(),
+                html_b: "".to_string(),
+                html_r: "".to_string(),
+            },
+            cae_aspects: vec![],
+            int_lame: None,
+            int_mots_cles: vec![],
+            int_carte: vec![],
+            int_html: "".to_string(),
+            coi_lame: None,
+            coi_mots_cles: vec![],
+            coi_carte: vec![],
+            coi_html: HtmlNBR {
+                html: "".to_string(),
+                html_b: "".to_string(),
+                html_r: "".to_string(),
+            },
+            coi_aspects: vec![],
+            coe_lame: None,
+            coe_mots_cles: vec![],
+            coe_carte: vec![],
+            coe_html: HtmlNBR {
+                html: "".to_string(),
+                html_b: "".to_string(),
+                html_r: "".to_string(),
+            },
+            coe_aspects: vec![],
+            nem_lame: None,
+            nem_mots_cles: vec![],
+            nem_carte: vec![],
+            nem_html: HtmlNBR {
+                html: "".to_string(),
+                html_b: "".to_string(),
+                html_r: "".to_string(),
+            },
+            nem_aspects: vec![],
+            pex_lame: None,
+            pex_mots_cles: vec![],
+            pex_carte: vec![],
+            pex_html: HtmlNBR {
+                html: "".to_string(),
+                html_b: "".to_string(),
+                html_r: "".to_string(),
+            },
+            pex_aspects: vec![],
+            ppr_lame: None,
+            ppr_mots_cles: vec![],
+            ppr_carte: vec![],
+            ppr_html: HtmlNBR {
+                html: "".to_string(),
+                html_b: "".to_string(),
+                html_r: "".to_string(),
+            },
+            ppr_aspects: vec![],
+        }
+    }
+
+    /// Calcul du tout pour traitement docx-rs
     pub async fn get_all(&mut self) -> Result<(()), reqwest::Error> {
         for x in TraitementNumerologie::iter() {
             let carte: u32 = match &x  {
                 TraitementNumerologie::Cai => {
-                    self.numerologie.interpretation_cai as u32
+                    self.numerologie.interpretation_cai
                 },
                 TraitementNumerologie::Cae => {
-                    self.numerologie.interpretation_cae as u32
+                    self.numerologie.interpretation_cae
                 }
                 TraitementNumerologie::Int => {
-                    self.numerologie.interpretation_int as u32
+                    self.numerologie.interpretation_int
                 }
                 TraitementNumerologie::Coi => {
-                    self.numerologie.interpretation_coi as u32
+                    self.numerologie.interpretation_coi
                 }
                 TraitementNumerologie::Coe => {
-                    self.numerologie.interpretation_coe as u32
+                    self.numerologie.interpretation_coe
                 }
                 TraitementNumerologie::Nem => {
-                    self.numerologie.interpretation_nem as u32
+                    self.numerologie.interpretation_nem
                 }
                 TraitementNumerologie::Pex => {
-                    self.numerologie.interpretation_pex as u32
+                    self.numerologie.interpretation_pex
                 }
                 TraitementNumerologie::Ppr => {
-                    self.numerologie.interpretation_ppr as u32
+                    self.numerologie.interpretation_ppr
                 }
             };
             let url = format!("{}/api/lame_majeures/{}", self.base_url, carte);
@@ -251,6 +328,100 @@ impl ThemeNumerologie {
             }
         }
         self.compute_html_and_aspect_data();
+        Ok(())
+    }
+
+    /// Traitement pour selection pour text pure rust pour Swift
+    pub async fn get_traitement(&self, traitement: TraitementNumerologie) -> Result<(()), reqwest::Error> {
+        let carte: u32 = match &traitement  {
+            TraitementNumerologie::Cai => {
+                self.numerologie.interpretation_cai
+            },
+            TraitementNumerologie::Cae => {
+                self.numerologie.interpretation_cae
+            }
+            TraitementNumerologie::Int => {
+                self.numerologie.interpretation_int
+            }
+            TraitementNumerologie::Coi => {
+                self.numerologie.interpretation_coi
+            }
+            TraitementNumerologie::Coe => {
+                self.numerologie.interpretation_coe
+            }
+            TraitementNumerologie::Nem => {
+                self.numerologie.interpretation_nem
+            }
+            TraitementNumerologie::Pex => {
+                self.numerologie.interpretation_pex
+            }
+            TraitementNumerologie::Ppr => {
+                self.numerologie.interpretation_ppr
+            }
+        };
+        let url = format!("{}/api/lame_majeures/{}", self.base_url, carte);
+        let client = Client::new();
+        let resp: Response =
+            client
+                .get(&url)
+                .bearer_auth(&self.token)
+                .send()
+                .await?
+                .error_for_status()?;
+        let lame: Option<LameMajeureDetail> = match &traitement {
+            TraitementNumerologie::Cai => {
+                Some(resp.json().await?)
+            }
+            TraitementNumerologie::Cae => {
+                Some(resp.json().await?)
+            }
+            TraitementNumerologie::Int => {
+                Some(resp.json().await?)
+            }
+            TraitementNumerologie::Coi => {
+                Some(resp.json().await?)
+            }
+            TraitementNumerologie::Coe => {
+                Some(resp.json().await?)
+            }
+            TraitementNumerologie::Nem => {
+                Some(resp.json().await?)
+            }
+            TraitementNumerologie::Pex => {
+                Some(resp.json().await?)
+            }
+            TraitementNumerologie::Ppr => {
+                Some(resp.json().await?)
+            }
+        };
+        let html_lame: String = match &traitement {
+            TraitementNumerologie::Cai => {
+                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
+            }
+            TraitementNumerologie::Cae => {
+                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
+            }
+            TraitementNumerologie::Int => {
+                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
+            }
+            TraitementNumerologie::Coi => {
+                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
+            }
+            TraitementNumerologie::Coe => {
+                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
+            }
+            TraitementNumerologie::Nem => {
+                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
+            }
+            TraitementNumerologie::Pex => {
+                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
+            }
+            TraitementNumerologie::Ppr => {
+                lame.unwrap().numerologie_caractere_intime.unwrap().html_body_one_note_raw
+            }
+        };
+        let res = extract_supers_and_bold_and_italic(html_lame.as_str());
+        println!("{}",res.0);
         Ok(())
     }
 
@@ -629,6 +800,8 @@ pub struct TNumerologieClient {
 }
 
 impl TNumerologieClient {
+    /// Traitement avec les cartes
+    /// Pour docx-rs
     pub fn new(token_n: String, token_t: String, path_cartes: String) -> Self {
         Self {
             base_url: "https://t.bressani.dev:1178".to_string(),
@@ -638,6 +811,19 @@ impl TNumerologieClient {
         }
     }
 
+    /// Sans carte pour le traitement sans docx
+    /// Donc purement text rust
+    pub fn new_sans_cartes(token_n: String, token_t: String) -> Self {
+        Self {
+            base_url: "https://t.bressani.dev:1178".to_string(),
+            path_cartes: "".to_string(),
+            token_n,
+            token_t,
+        }
+    }
+
+    /// Traitement avec les cartes
+    /// Pour docx-rs
     pub async fn get_index(&self, id: u32) -> Result<ThemeNumerologie, reqwest::Error> {
         let url = format!("{}/api/numerologie/{}", self.base_url, id);
         let client = Client::new();
@@ -650,6 +836,22 @@ impl TNumerologieClient {
 
         let numerologie: Numerologie = resp.json().await?;
         Ok(ThemeNumerologie::new(numerologie, self.token_n.as_str().to_string(), self.path_cartes.clone()))
+    }
+
+    /// Sans carte pour le traitement sans docx
+    /// Donc purement text rust
+    pub async fn get_index_sans_cartes(&self, id: u32) -> Result<ThemeNumerologie, reqwest::Error> {
+        let url = format!("{}/api/numerologie/{}", self.base_url, id);
+        let client = Client::new();
+        let resp: Response = client
+            .get(&url)
+            .bearer_auth(&self.token_t)
+            .send()
+            .await?
+            .error_for_status()?; // transforme les réponses 4xx/5xx en erreur
+
+        let numerologie: Numerologie = resp.json().await?;
+        Ok(ThemeNumerologie::new_sans_cartes(numerologie, self.token_n.as_str().to_string()))
     }
 
 }
