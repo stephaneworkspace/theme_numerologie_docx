@@ -8,7 +8,7 @@ pub async fn prepare_selection(token_n: Option<String>, token_t: Option<String>,
             let client = TNumerologieClient::new_sans_cartes(t_n, t_t);
             match client.get_index_sans_cartes(id).await {
                 Ok(mut ok) => {
-                    match ok.get_traitement(traitement).await {
+                    match ok.selection_traitement_json(traitement).await {
                         Ok(_) => {},
                         Err(e) => {
                             return Err(Box::new(e));

@@ -20,10 +20,10 @@ pub trait TraitSelectionThemeNumerologie {
     fn new_sans_cartes(numerologie: Numerologie, token: String) -> Self
     where
         Self: Sized;
-    fn get_traitement(
+    fn selection_traitement_json(
         &self,
         traitement: TraitementNumerologie
-    ) -> impl std::future::Future<Output = Result<(()), reqwest::Error>> + Send;
+    ) -> impl std::future::Future<Output = Result<(String), reqwest::Error>> + Send;
 }
 
 pub trait TraitSelectionNumerologie {
@@ -136,7 +136,7 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
             ppr_aspects: vec![],
         }
     }
-    async fn get_traitement(&self, traitement: TraitementNumerologie) -> Result<(()), reqwest::Error> {
+    async fn selection_traitement_json(&self, traitement: TraitementNumerologie) -> Result<(String), reqwest::Error> {
         let carte: u32 = match &traitement  {
             TraitementNumerologie::Cai => {
                 self.numerologie.interpretation_cai
@@ -280,11 +280,14 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                     }
                 })
         );
-
-        println!("{}",res.0);
-        println!("{} {:?}",res_b.0, res_b.1);
-        println!("{} {:?}",res_r.0, res_r.1);
-        println!("{:?}",traitement_aspects);
+        let mut selection: Selection = Selection {
+            note_de_cours: vec![],
+            traitement: SelectionTraitment {
+                html: res.0,
+                html_b: if res_b.0 == "" { None } else { Some(res_b.0) },
+                html_r: if res_r.0 == "" { None } else { Some(res_r.0) },
+            },
+        };
         let mut selection_note_de_cours: Vec<SelectionNoteDeCours> = vec![];
         for (i, x) in l.numerologie_note_de_cours.iter().enumerate() {
             let ndc_res = extract_supers_and_bold_and_italic(x.html_body_one_note_raw.as_str(), false);
@@ -404,13 +407,21 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                         }
                     })
             );
-            println!("{} {:?}",i, selection_note_de_cours);
-            //println!("{:?}",ndc_traitement_aspects);
         }
-        Ok(())
+        selection.note_de_cours = selection_note_de_cours;
+        let json = serde_json::to_string_pretty(&selection)
+            .expect("Erreur de sérialisation Selection");
+        println!("{}", json.clone());
+        Ok(json)
     }
 }
 
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct SelectionMotCle {
+    pub mot_cle: String,
+    pub mot_cle_indice: Option<String>,
+    pub polarite: Option<String>,
+}
 
 #[derive(Clone, Debug, Serialize)]
 pub struct SelectionNoteDeCours {
@@ -428,13 +439,6 @@ pub struct SelectionTraitment {
 }
 #[derive(Clone, Debug, Serialize)]
 pub struct Selection {
-    pub note_de_cours: Vec<SelectionMotCle>,
+    pub note_de_cours: Vec<SelectionNoteDeCours>,
     pub traitement: SelectionTraitment
-}
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct SelectionMotCle {
-    pub mot_cle: String,
-    pub mot_cle_indice: Option<String>,
-    pub polarite: Option<String>,
 }
