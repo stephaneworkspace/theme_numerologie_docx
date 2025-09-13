@@ -7,6 +7,8 @@ c'est pour du traitement :
 Html -> Balise spécial -> SwiftUi
  */
 use reqwest::{Client, Response};
+use serde::Serialize;
+use strum_macros::EnumIter;
 use crate::api::{LameMajeureDetail, Numerologie, ThemeNumerologie, TraitementNumerologie};
 use crate::api::numerologie::HtmlNBR;
 use crate::core_docx::{ColorEnum, NumerologieAspects};
@@ -282,16 +284,20 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
         println!("{} {:?}",res_b.0, res_b.1);
         println!("{} {:?}",res_r.0, res_r.1);
         println!("{:?}",traitement_aspects);
+        let mut selection_note_de_cours: Vec<SelectionNoteDeCours> = vec![];
         for (i, x) in l.numerologie_note_de_cours.iter().enumerate() {
-            println!("Note de cours : {i}");
             let ndc_res = extract_supers_and_bold_and_italic(x.html_body_one_note_raw.as_str(), false);
-            println!("[Noir]: {} {:?}", ndc_res.0, ndc_res.1);
             let ndc_res_r = extract_supers_and_bold_and_italic(x.html_body_one_note_raw_r.as_str(), false);
-            println!("[Rouge]: {} {:?}", ndc_res_r.0, ndc_res_r.0);
             let ndc_res_r2 = extract_supers_and_bold_and_italic(x.html_body_one_note_raw_r2.as_str(), false);
-            if ndc_res_r2.0.clone() != "" {
-                println!("{} {:?}", ndc_res_r2.0, ndc_res_r2.0);
-            }
+            let ndc_html_r: Option<String> = if ndc_res_r.0 == "" { None } else { Some(ndc_res_r.0)};
+            let ndc_html_r2: Option<String> = if ndc_res_r2.0 == "" { None } else { Some(ndc_res_r2.0)};
+            selection_note_de_cours.push(SelectionNoteDeCours {
+                mots_cle: vec![], // TODO
+                html: ndc_res.0,
+                html_r: ndc_html_r,
+                html_r2: ndc_html_r2,
+            });
+
             let mut ndc_traitement_aspects: Vec<NumerologieAspects> = vec![];
             ndc_traitement_aspects = ndc_res.1.as_slice().into_iter().map(|x| {
                 let mut find = false;
@@ -384,10 +390,29 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                         }
                     })
             );
-
-            println!("{:?}",ndc_traitement_aspects);
+            println!("{} {:?}",i, selection_note_de_cours);
+            //println!("{:?}",ndc_traitement_aspects);
         }
         Ok(())
     }
+}
 
+
+#[derive(Clone, Debug, Serialize)]
+pub struct SelectionNoteDeCours {
+    mots_cle: Vec<String>,
+    html: String,
+    html_r: Option<String>,
+    html_r2: Option<String>,
+}
+#[derive(Clone, Debug, Serialize)]
+pub struct SelectionTraitment {
+    html: String,
+    html_b: Option<String>,
+    html_r: Option<String>,
+}
+#[derive(Clone, Debug, Serialize)]
+pub struct Selection {
+    pub note_de_cours: Vec<SelectionNoteDeCours>,
+    pub traitement: SelectionTraitment
 }
