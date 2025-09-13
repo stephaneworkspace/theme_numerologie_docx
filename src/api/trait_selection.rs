@@ -228,7 +228,27 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                 x.nom.clone().unwrap()
             })
             .collect();
-
+        let mut ndc_all_aspects_b: Vec<String> = vec![];
+        ndc_all_aspects_b = l.clone().numerologie_aspects.as_slice()
+            .iter()
+            .filter(|x| {
+                x.polarite.as_deref() == Some("+") && x.nom.clone().is_some()
+            })
+            .map(|x| {
+                x.nom.clone().unwrap()
+            })
+            .collect();
+        let mut ndc_all_aspects_r: Vec<String> = vec![];
+        ndc_all_aspects_r = l.clone().numerologie_aspects.as_slice()
+            .iter()
+            .filter(|x| {
+                x.polarite.as_deref() == Some("-") && x.nom.clone().is_some()
+            })
+            .map(|x| {
+                x.nom.clone().unwrap()
+            })
+            .collect();
+        //---
         let mut traitement_aspects: Vec<NumerologieAspects> = vec![];
         traitement_aspects = res_b.1.as_slice().into_iter().map(|x| {
             let mut find = false;
@@ -262,6 +282,111 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
         println!("{} {:?}",res_b.0, res_b.1);
         println!("{} {:?}",res_r.0, res_r.1);
         println!("{:?}",traitement_aspects);
+        for (i, x) in l.numerologie_note_de_cours.iter().enumerate() {
+            println!("Note de cours : {i}");
+            let ndc_res = extract_supers_and_bold_and_italic(x.html_body_one_note_raw.as_str(), false);
+            println!("[Noir]: {} {:?}", ndc_res.0, ndc_res.1);
+            let ndc_res_r = extract_supers_and_bold_and_italic(x.html_body_one_note_raw_r.as_str(), false);
+            println!("[Rouge]: {} {:?}", ndc_res_r.0, ndc_res_r.0);
+            let ndc_res_r2 = extract_supers_and_bold_and_italic(x.html_body_one_note_raw_r2.as_str(), false);
+            if ndc_res_r2.0.clone() != "" {
+                println!("{} {:?}", ndc_res_r2.0, ndc_res_r2.0);
+            }
+            let mut ndc_traitement_aspects: Vec<NumerologieAspects> = vec![];
+            ndc_traitement_aspects = ndc_res.1.as_slice().into_iter().map(|x| {
+                let mut find = false;
+                for y in bold_aspects.as_slice().iter() {
+                    if x == y {
+                        find = true;
+                        break;
+                    }
+                }
+                let mut color = ColorEnum::Noir;
+                for y in ndc_all_aspects_b.as_slice().iter() {
+                    if x == y {
+                        color = ColorEnum::Bleu;
+                        break;
+                    }
+                }
+                for y in ndc_all_aspects_r.as_slice().iter() {
+                    if x == y {
+                        color = ColorEnum::Rouge;
+                        break;
+                    }
+                }
+                NumerologieAspects {
+                    aspect: x.to_string(),
+                    color: color,
+                    sw_bold: find,
+                }
+            }).collect();
+            ndc_traitement_aspects.extend(
+                ndc_res_r.1
+                    .as_slice()
+                    .into_iter()
+                    .map(|x| {
+                        let mut find = false;
+                        for y in bold_aspects.as_slice().iter() {
+                            if x == y {
+                                find = true;
+                                break;
+                            }
+                        }
+                        let mut color = ColorEnum::Noir;
+                        for y in ndc_all_aspects_b.as_slice().iter() {
+                            if x == y {
+                                color = ColorEnum::Bleu;
+                                break;
+                            }
+                        }
+                        for y in ndc_all_aspects_r.as_slice().iter() {
+                            if x == y {
+                                color = ColorEnum::Rouge;
+                                break;
+                            }
+                        }
+                        NumerologieAspects {
+                            aspect: x.to_string(),
+                            color: color,
+                            sw_bold: find,
+                        }
+                    })
+            );
+            ndc_traitement_aspects.extend(
+                ndc_res_r2.1
+                    .as_slice()
+                    .into_iter()
+                    .map(|x| {
+                        let mut find = false;
+                        for y in bold_aspects.as_slice().iter() {
+                            if x == y {
+                                find = true;
+                                break;
+                            }
+                        }
+                        let mut color = ColorEnum::Noir;
+                        for y in ndc_all_aspects_b.as_slice().iter() {
+                            if x == y {
+                                color = ColorEnum::Bleu;
+                                break;
+                            }
+                        }
+                        for y in ndc_all_aspects_r.as_slice().iter() {
+                            if x == y {
+                                color = ColorEnum::Rouge;
+                                break;
+                            }
+                        }
+                        NumerologieAspects {
+                            aspect: x.to_string(),
+                            color: color,
+                            sw_bold: find,
+                        }
+                    })
+            );
+
+            println!("{:?}",ndc_traitement_aspects);
+        }
         Ok(())
     }
 
