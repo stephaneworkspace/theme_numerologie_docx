@@ -178,6 +178,8 @@ pub struct NumerologieNoteDeCours {
     pub id: String,
     pub lame_majeure_id: u32,
     pub html_body_one_note_raw: String,
+    pub html_body_one_note_raw_r: String,
+    pub html_body_one_note_raw_r2: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub mots_cles: Vec<NumerologieMotCle>,
