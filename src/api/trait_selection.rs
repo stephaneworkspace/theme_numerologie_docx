@@ -6,10 +6,11 @@ Donc rien avoir avec le nom original de ce crate,
 c'est pour du traitement :
 Html -> Balise spécial -> SwiftUi
  */
+use chrono::{DateTime, Utc};
 use reqwest::{Client, Response};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use strum_macros::EnumIter;
-use crate::api::{LameMajeureDetail, Numerologie, ThemeNumerologie, TraitementNumerologie};
+use crate::api::{LameMajeureDetail, Numerologie, NumerologieMotCle, ThemeNumerologie, TraitementNumerologie};
 use crate::api::numerologie::HtmlNBR;
 use crate::core_docx::{ColorEnum, NumerologieAspects};
 use crate::html_tools::extract_supers_and_bold_and_italic;
@@ -291,8 +292,21 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
             let ndc_res_r2 = extract_supers_and_bold_and_italic(x.html_body_one_note_raw_r2.as_str(), false);
             let ndc_html_r: Option<String> = if ndc_res_r.0 == "" { None } else { Some(ndc_res_r.0)};
             let ndc_html_r2: Option<String> = if ndc_res_r2.0 == "" { None } else { Some(ndc_res_r2.0)};
+            let mut aspects_cles: Vec<String> = vec![];
+            aspects_cles.extend(ndc_res.1.iter().map(|xx|xx.clone()));
+            aspects_cles.extend(ndc_res_r.1.iter().map(|xx|xx.clone()));
+            aspects_cles.extend(ndc_res_r2.1.iter().map(|xx|xx.clone()));
+            let mut ndc_mots_cles: Vec<SelectionMotCle> = vec![];
+            ndc_mots_cles = x.mots_cles.as_slice().iter().map(|xx| {
+                SelectionMotCle {
+                    mot_cle: xx.mot_cle.clone(),
+                    mot_cle_indice: if xx.mot_cle_indice.clone() == Some("".to_string()) { None } else { xx.mot_cle_indice.clone() },
+                    polarite: xx.polarite.clone(),
+                }
+            }).collect();
             selection_note_de_cours.push(SelectionNoteDeCours {
-                mots_cle: vec![], // TODO
+                mots_cles: ndc_mots_cles,
+                aspects_cles,
                 html: ndc_res.0,
                 html_r: ndc_html_r,
                 html_r2: ndc_html_r2,
@@ -400,7 +414,8 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
 
 #[derive(Clone, Debug, Serialize)]
 pub struct SelectionNoteDeCours {
-    mots_cle: Vec<String>,
+    mots_cles: Vec<SelectionMotCle>,
+    aspects_cles: Vec<String>,
     html: String,
     html_r: Option<String>,
     html_r2: Option<String>,
@@ -413,6 +428,13 @@ pub struct SelectionTraitment {
 }
 #[derive(Clone, Debug, Serialize)]
 pub struct Selection {
-    pub note_de_cours: Vec<SelectionNoteDeCours>,
+    pub note_de_cours: Vec<SelectionMotCle>,
     pub traitement: SelectionTraitment
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct SelectionMotCle {
+    pub mot_cle: String,
+    pub mot_cle_indice: Option<String>,
+    pub polarite: Option<String>,
 }

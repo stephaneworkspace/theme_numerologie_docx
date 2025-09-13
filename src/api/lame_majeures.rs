@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use crate::api::numerologie::ThemeNumerologie;
 use crate::core_docx::{ColorEnum, NumerologieAspects};
 
