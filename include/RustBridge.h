@@ -4,5 +4,6 @@
 #include <stdio.h>
 
 const char* theme(const char* password, const char* path_cartes, const char* nom, const char* date, int id);
+const char* selection(const char* password, int type_traitement, int id);
 
 #endif /* RustBridge_h */

@@ -411,7 +411,6 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
         selection.note_de_cours = selection_note_de_cours;
         let json = serde_json::to_string_pretty(&selection)
             .expect("Erreur de sérialisation Selection");
-        println!("{}", json.clone());
         Ok(json)
     }
 }

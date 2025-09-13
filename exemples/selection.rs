@@ -21,6 +21,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Token N: {:?}", token_n);
     println!("Token T: {:?}", token_t);
     let traitement: TraitementNumerologie = TraitementNumerologie::Cai;
-    prepare_selection(token_n, token_t, id, traitement).await?;
+    let json = prepare_selection(token_n, token_t, id, traitement).await?;
+    println!("{}", json.clone());
     Ok(())
 }

@@ -19,7 +19,9 @@ use serde_json::Value;
 use log::error;
 use std::fs;
 use std::path::PathBuf;
+use crate::api::TraitementNumerologie;
 use crate::prepare_docx::prepare_docx;
+use crate::prepare_selection::prepare_selection;
 
 #[no_mangle]
 pub extern "C" fn theme(password: *const libc::c_char, path_cartes: *const libc::c_char, nom: *const libc::c_char, date: *const libc::c_char, id: libc::c_int) -> *const libc::c_char {
@@ -92,7 +94,61 @@ pub extern "C" fn theme(password: *const libc::c_char, path_cartes: *const libc:
             CString::new(format!("{{\"error\":\"{}\"}}", msg)).unwrap()
         }
     };
-    eprintln!("Json : {:?}", json_cstring.clone().into_raw());
+
+    json_cstring.into_raw()
+}
+
+#[no_mangle]
+pub extern "C" fn selection(password: *const libc::c_char, type_traitement: libc::c_int, id: libc::c_int) -> *const libc::c_char {
+    use std::ffi::CStr;
+    println!("Selection");
+    // Conversion
+    let c_str = unsafe { CStr::from_ptr(password) };
+    let password_str = match c_str.to_str() {
+        Ok(s) => s,
+        Err(_) => return std::ptr::null_mut(),
+    };
+
+    let type_traitement_u32 = type_traitement as u32;
+    let id_u32 = id as u32;
+
+    let rt = match tokio::runtime::Runtime::new() {
+        Ok(r) => r,
+        Err(e) => {
+            eprintln!("Erreur lors de la création du runtime Tokio: {}", e);
+            return CString::new("{\"error\":\"tokio runtime\"}").unwrap().into_raw();
+        }
+    };
+
+    let result: Result<String, Box<dyn std::error::Error>> = rt.block_on(async {
+        // MultiAuth sécurisé
+        let auth = MultiAuth::new(password_str.to_string()).await;
+        let (token_n, token_t) = auth.get_token();
+        let traitement: TraitementNumerologie = match type_traitement_u32 {
+            1 => TraitementNumerologie::Ppr,
+            2 => TraitementNumerologie::Cai,
+            3 => TraitementNumerologie::Cae,
+            4 => TraitementNumerologie::Coi,
+            5 => TraitementNumerologie::Coe,
+            6 => TraitementNumerologie::Int,
+            7 => TraitementNumerologie::Nem,
+            8 => TraitementNumerologie::Pex,
+            _ => {
+                TraitementNumerologie::Ppr
+            }
+        };
+        let json: String = prepare_selection(token_n, token_t, id_u32, traitement).await?;
+
+        Ok(json)
+    });
+
+    let json_cstring = match result {
+        Ok(json) => CString::new(json.to_string()).unwrap(),
+        Err(msg) => {
+            eprintln!("Erreur durant l'exécution async : {}", msg);
+            CString::new(format!("{{\"error\":\"{}\"}}", msg)).unwrap()
+        }
+    };
 
     json_cstring.into_raw()
 }
