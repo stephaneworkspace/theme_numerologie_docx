@@ -416,7 +416,7 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone)]
 pub struct SelectionMotCle {
     pub mot_cle: String,
     pub mot_cle_indice: Option<String>,
