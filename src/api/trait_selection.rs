@@ -9,6 +9,7 @@ Html -> Balise spécial -> SwiftUi
 use chrono::{DateTime, Utc};
 use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
+use serde::de::Unexpected::Map;
 use strum_macros::EnumIter;
 use crate::api::{LameMajeureDetail, Numerologie, NumerologieMotCle, ThemeNumerologie, TraitementNumerologie};
 use crate::api::numerologie::HtmlNBR;
@@ -200,6 +201,7 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
         };
         let l = &lame.unwrap();
         let lt = &l.numerologie_caractere_intime;
+        let la = &l.numerologie_aspects;
         let (html_lame, html_lame_b, html_lame_r) = match &traitement {
             TraitementNumerologie::Cai
             | TraitementNumerologie::Cae
@@ -282,6 +284,7 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
         );
         let mut selection: Selection = Selection {
             note_de_cours: vec![],
+            aspects: vec![],
             traitement: SelectionTraitment {
                 html: res.0,
                 html_b: if res_b.0 == "" { None } else { Some(res_b.0) },
@@ -409,6 +412,53 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
             );
         }
         selection.note_de_cours = selection_note_de_cours;
+        selection.aspects = la.iter().map(|x| {
+            let nom: String = if x.nom.is_some() {
+                x.nom.clone().unwrap()
+            } else {
+                "".to_string()
+            };
+            let polarite: String = if x.polarite.is_some() {
+                x.polarite.clone().unwrap()
+            } else {
+                "".to_string()
+            };
+            let def_robert_l1: String = if x.def_robert_l1.is_some() {
+                x.def_robert_l1.clone().unwrap()
+            } else {
+                "".to_string()
+            };
+            let def_robert_l2: String = if x.def_robert_l2.is_some() {
+                x.def_robert_l2.clone().unwrap()
+            } else {
+                "".to_string()
+            };
+            let def_robert_l3: String = if x.def_robert_l3.is_some() {
+                x.def_robert_l3.clone().unwrap()
+            } else {
+                "".to_string()
+            };
+            let def_robert_l4: String = if x.def_robert_l4.is_some() {
+                x.def_robert_l4.clone().unwrap()
+            } else {
+                "".to_string()
+            };
+            let def_robert_l5: String = if x.def_robert_l5.is_some() {
+                x.def_robert_l5.clone().unwrap()
+            } else {
+                "".to_string()
+            };
+            SelectionAspect {
+                nom: nom,
+                sw_bold: x.sw_bold,
+                polarite: polarite,
+                def_robert_l1: def_robert_l1,
+                def_robert_l2: def_robert_l2,
+                def_robert_l3: def_robert_l3,
+                def_robert_l4: def_robert_l4,
+                def_robert_l5: def_robert_l5,
+            }
+        }).collect();
         let json = serde_json::to_string_pretty(&selection)
             .expect("Erreur de sérialisation Selection");
         Ok(json)
@@ -437,7 +487,20 @@ pub struct SelectionTraitment {
     html_r: Option<String>,
 }
 #[derive(Clone, Debug, Serialize)]
+pub struct SelectionAspect {
+    pub nom: String,
+    pub sw_bold: bool,
+    pub polarite: String,
+    pub def_robert_l1: String,
+    pub def_robert_l2: String,
+    pub def_robert_l3: String,
+    pub def_robert_l4: String,
+    pub def_robert_l5: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
 pub struct Selection {
     pub note_de_cours: Vec<SelectionNoteDeCours>,
+    pub aspects: Vec<SelectionAspect>,
     pub traitement: SelectionTraitment
 }
