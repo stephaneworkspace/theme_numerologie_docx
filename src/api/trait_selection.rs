@@ -282,6 +282,10 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                     }
                 })
         );
+        let mut aspects_cles: Vec<String> = vec![];
+        //aspects_cles.extend(res.1.iter().map(|xx|xx.clone()));
+        aspects_cles.extend(res_b.1.iter().map(|xx|xx.clone()));
+        aspects_cles.extend(res_r.1.iter().map(|xx|xx.clone()));
         let mut selection: Selection = Selection {
             note_de_cours: vec![],
             aspects: vec![],
@@ -289,6 +293,7 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                 html: res.0,
                 html_b: if res_b.0 == "" { None } else { Some(res_b.0) },
                 html_r: if res_r.0 == "" { None } else { Some(res_r.0) },
+                aspects_cles,
             },
         };
         let mut selection_note_de_cours: Vec<SelectionNoteDeCours> = vec![];
@@ -485,6 +490,7 @@ pub struct SelectionTraitment {
     html: String,
     html_b: Option<String>,
     html_r: Option<String>,
+    aspects_cles: Vec<String>,
 }
 #[derive(Clone, Debug, Serialize)]
 pub struct SelectionAspect {
