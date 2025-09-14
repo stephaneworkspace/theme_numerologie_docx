@@ -290,9 +290,9 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
         };
         let mut selection_note_de_cours: Vec<SelectionNoteDeCours> = vec![];
         for (i, x) in l.numerologie_note_de_cours.iter().enumerate() {
-            let ndc_res = extract_supers_and_bold_and_italic(x.html_body_one_note_raw.as_str(), false);
-            let ndc_res_r = extract_supers_and_bold_and_italic(x.html_body_one_note_raw_r.as_str(), false);
-            let ndc_res_r2 = extract_supers_and_bold_and_italic(x.html_body_one_note_raw_r2.as_str(), false);
+            let ndc_res = extract_supers_and_bold_and_italic(x.html_body_one_note_raw.as_str(), true);
+            let ndc_res_r = extract_supers_and_bold_and_italic(x.html_body_one_note_raw_r.as_str(), true);
+            let ndc_res_r2 = extract_supers_and_bold_and_italic(x.html_body_one_note_raw_r2.as_str(), true);
             let ndc_html_r: Option<String> = if ndc_res_r.0 == "" { None } else { Some(ndc_res_r.0)};
             let ndc_html_r2: Option<String> = if ndc_res_r2.0 == "" { None } else { Some(ndc_res_r2.0)};
             let mut aspects_cles: Vec<String> = vec![];
