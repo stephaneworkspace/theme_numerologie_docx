@@ -152,3 +152,14 @@ pub extern "C" fn selection_traitment(password: *const libc::c_char, type_traite
 
     json_cstring.into_raw()
 }
+
+#[no_mangle]
+pub extern "C" fn free_cstring(ptr: *mut libc::c_char) {
+    if ptr.is_null() {
+        return;
+    }
+    unsafe {
+        // Reprend la propriété de la mémoire et la libère automatiquement
+        let _ = CString::from_raw(ptr);
+    }
+}
