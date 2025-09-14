@@ -502,5 +502,5 @@ pub struct SelectionAspect {
 pub struct Selection {
     pub note_de_cours: Vec<SelectionNoteDeCours>,
     pub aspects: Vec<SelectionAspect>,
-    pub traitement: SelectionTraitment
+    pub traitement: SelectionTraitment,
 }
