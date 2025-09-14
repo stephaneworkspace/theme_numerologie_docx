@@ -23,7 +23,8 @@ pub trait TraitSelectionThemeNumerologie {
         Self: Sized;
     fn selection_traitement_json(
         &self,
-        traitement: TraitementNumerologie
+        traitement: TraitementNumerologie,
+        carte: Option<u32>,
     ) -> impl std::future::Future<Output = Result<(String), reqwest::Error>> + Send;
 }
 
@@ -137,31 +138,35 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
             ppr_aspects: vec![],
         }
     }
-    async fn selection_traitement_json(&self, traitement: TraitementNumerologie) -> Result<(String), reqwest::Error> {
-        let carte: u32 = match &traitement  {
-            TraitementNumerologie::Cai => {
-                self.numerologie.interpretation_cai
-            },
-            TraitementNumerologie::Cae => {
-                self.numerologie.interpretation_cae
-            }
-            TraitementNumerologie::Int => {
-                self.numerologie.interpretation_int
-            }
-            TraitementNumerologie::Coi => {
-                self.numerologie.interpretation_coi
-            }
-            TraitementNumerologie::Coe => {
-                self.numerologie.interpretation_coe
-            }
-            TraitementNumerologie::Nem => {
-                self.numerologie.interpretation_nem
-            }
-            TraitementNumerologie::Pex => {
-                self.numerologie.interpretation_pex
-            }
-            TraitementNumerologie::Ppr => {
-                self.numerologie.interpretation_ppr
+    async fn selection_traitement_json(&self, traitement: TraitementNumerologie, carte: Option<u32>) -> Result<(String), reqwest::Error> {
+        let carte = if carte.is_some() {
+            carte.unwrap()
+        } else {
+            match &traitement {
+                TraitementNumerologie::Cai => {
+                    self.numerologie.interpretation_cai
+                },
+                TraitementNumerologie::Cae => {
+                    self.numerologie.interpretation_cae
+                }
+                TraitementNumerologie::Int => {
+                    self.numerologie.interpretation_int
+                }
+                TraitementNumerologie::Coi => {
+                    self.numerologie.interpretation_coi
+                }
+                TraitementNumerologie::Coe => {
+                    self.numerologie.interpretation_coe
+                }
+                TraitementNumerologie::Nem => {
+                    self.numerologie.interpretation_nem
+                }
+                TraitementNumerologie::Pex => {
+                    self.numerologie.interpretation_pex
+                }
+                TraitementNumerologie::Ppr => {
+                    self.numerologie.interpretation_ppr
+                }
             }
         };
         let url = format!("{}/api/lame_majeures/{}", self.base_url, carte);

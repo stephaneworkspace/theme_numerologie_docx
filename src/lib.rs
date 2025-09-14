@@ -99,7 +99,7 @@ pub extern "C" fn theme(password: *const libc::c_char, path_cartes: *const libc:
 }
 
 #[no_mangle]
-pub extern "C" fn selection_traitment(password: *const libc::c_char, type_traitement: libc::c_int, id: libc::c_int) -> *const libc::c_char {
+pub extern "C" fn selection_traitment(password: *const libc::c_char, type_traitement: libc::c_int, id: libc::c_int, carte: libc::c_int) -> *const libc::c_char {
     use std::ffi::CStr;
     println!("Selection");
     // Conversion
@@ -111,6 +111,7 @@ pub extern "C" fn selection_traitment(password: *const libc::c_char, type_traite
 
     let type_traitement_u32 = type_traitement as u32;
     let id_u32 = id as u32;
+    let carte_u32 = carte as u32;
 
     let rt = match tokio::runtime::Runtime::new() {
         Ok(r) => r,
@@ -137,7 +138,12 @@ pub extern "C" fn selection_traitment(password: *const libc::c_char, type_traite
                 TraitementNumerologie::Ppr
             }
         };
-        let json: String = prepare_selection(token_n, token_t, id_u32, traitement).await?;
+        let c = if carte_u32 == 0 {
+            None
+        } else {
+            Some(carte_u32)
+        };
+        let json: String = prepare_selection(token_n, token_t, id_u32, traitement, c).await?;
 
         Ok(json)
     });
