@@ -126,10 +126,10 @@ pub extern "C" fn selection_traitment(password: *const libc::c_char, type_traite
         let (token_n, token_t) = auth.get_token();
         let traitement: TraitementNumerologie = match type_traitement_u32 {
             1 => TraitementNumerologie::Ppr,
-            2 => TraitementNumerologie::Cai,
-            3 => TraitementNumerologie::Cae,
-            4 => TraitementNumerologie::Coi,
-            5 => TraitementNumerologie::Coe,
+            4 => TraitementNumerologie::Cai,
+            2 => TraitementNumerologie::Cae,
+            5 => TraitementNumerologie::Coi,
+            3 => TraitementNumerologie::Coe,
             6 => TraitementNumerologie::Int,
             7 => TraitementNumerologie::Nem,
             8 => TraitementNumerologie::Pex,
