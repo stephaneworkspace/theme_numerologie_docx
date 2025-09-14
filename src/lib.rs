@@ -99,7 +99,7 @@ pub extern "C" fn theme(password: *const libc::c_char, path_cartes: *const libc:
 }
 
 #[no_mangle]
-pub extern "C" fn selection(password: *const libc::c_char, type_traitement: libc::c_int, id: libc::c_int) -> *const libc::c_char {
+pub extern "C" fn selection_traitment(password: *const libc::c_char, type_traitement: libc::c_int, id: libc::c_int) -> *const libc::c_char {
     use std::ffi::CStr;
     println!("Selection");
     // Conversion
