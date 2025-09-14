@@ -201,6 +201,7 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
         };
         let l = &lame.unwrap();
         let lt = &l.numerologie_caractere_intime;
+        let lv = &l.numerologie_vocabulaire_divers;
         let la = &l.numerologie_aspects;
         let (html_lame, html_lame_b, html_lame_r) = match &traitement {
             TraitementNumerologie::Cai
@@ -286,6 +287,47 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
         //aspects_cles.extend(res.1.iter().map(|xx|xx.clone()));
         aspects_cles.extend(res_b.1.iter().map(|xx|xx.clone()));
         aspects_cles.extend(res_r.1.iter().map(|xx|xx.clone()));
+        let vocabulaire_divers: Vec<SelectionVocabulaireDivers> = lv.iter().map(|x| {
+            let nom: String = if x.nom.is_some() {
+                x.nom.clone().unwrap()
+            } else {
+                "".to_string()
+            };
+            let def_robert_l1: String = if x.def_robert_l1.is_some() {
+                x.def_robert_l1.clone().unwrap()
+            } else {
+                "".to_string()
+            };
+            let def_robert_l2: String = if x.def_robert_l2.is_some() {
+                x.def_robert_l2.clone().unwrap()
+            } else {
+                "".to_string()
+            };
+            let def_robert_l3: String = if x.def_robert_l3.is_some() {
+                x.def_robert_l3.clone().unwrap()
+            } else {
+                "".to_string()
+            };
+            let def_robert_l4: String = if x.def_robert_l4.is_some() {
+                x.def_robert_l4.clone().unwrap()
+            } else {
+                "".to_string()
+            };
+            let def_robert_l5: String = if x.def_robert_l5.is_some() {
+                x.def_robert_l5.clone().unwrap()
+            } else {
+                "".to_string()
+            };
+            SelectionVocabulaireDivers {
+                nom: nom,
+                def_robert_l1: def_robert_l1,
+                def_robert_l2: def_robert_l2,
+                def_robert_l3: def_robert_l3,
+                def_robert_l4: def_robert_l4,
+                def_robert_l5: def_robert_l5,
+            }
+
+        }).collect();
         let mut selection: Selection = Selection {
             note_de_cours: vec![],
             aspects: vec![],
@@ -295,6 +337,7 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                 html_r: if res_r.0 == "" { None } else { Some(res_r.0) },
                 aspects_cles,
             },
+            vocabulaire_divers,
         };
         let mut selection_note_de_cours: Vec<SelectionNoteDeCours> = vec![];
         for (i, x) in l.numerologie_note_de_cours.iter().enumerate() {
@@ -505,8 +548,19 @@ pub struct SelectionAspect {
 }
 
 #[derive(Clone, Debug, Serialize)]
+pub struct SelectionVocabulaireDivers {
+    pub nom: String,
+    pub def_robert_l1: String,
+    pub def_robert_l2: String,
+    pub def_robert_l3: String,
+    pub def_robert_l4: String,
+    pub def_robert_l5: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
 pub struct Selection {
     pub note_de_cours: Vec<SelectionNoteDeCours>,
     pub aspects: Vec<SelectionAspect>,
     pub traitement: SelectionTraitment,
+    pub vocabulaire_divers: Vec<SelectionVocabulaireDivers>
 }
