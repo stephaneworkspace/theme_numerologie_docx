@@ -31,6 +31,7 @@ pub struct LameMajeuresDivination {
     pub situation: Option<String>,
     pub evenement: Option<String>,
     pub point_particulier: Option<String>,
+    pub archetype: Option<String>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
