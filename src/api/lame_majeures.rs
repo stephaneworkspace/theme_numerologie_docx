@@ -234,6 +234,17 @@ pub struct NumerologiePersonaliteProfonde {
 }
 
 #[derive(Debug, Deserialize, Clone)]
+pub struct NumerologieRechercheHarmonie {
+    pub id: String,
+    pub lame_majeure_id: u32,
+    pub html_body_one_note_raw: String,
+    pub html_body_one_note_raw_r: String, // N'est pas affiché dans le frontend
+    pub html_body_one_note_raw_b: String, // N'est pas affiché dans le frontend
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
 pub struct NumerologieCaractereIntime {
     pub id: String,
     pub lame_majeure_id: u32,
@@ -356,6 +367,7 @@ pub struct LameMajeureDetail {
     pub numerologie_note_de_cours: Vec<NumerologieNoteDeCours>,
     pub numerologie_message_karmique: Option<NumerologieMessageKarmique>,
     pub numerologie_personalite_profonde: Option<NumerologiePersonaliteProfonde>,
+    pub numerologie_recherche_harmonie: Option<NumerologieRechercheHarmonie>,
     pub numerologie_caractere_intime: Option<NumerologieCaractereIntime>,
     pub numerologie_intellect: Option<NumerologieIntellect>,
     pub numerologie_caractere_social: Option<NumerologieCaractereSocial>,

@@ -1,7 +1,7 @@
 use std::fs;
 use serde::Deserialize;
 use reqwest::{Client, Response};
-use crate::api::{LameMajeureDetail, NumerologieCaractereIntime, NumerologieCaractereSocial, NumerologieComportementIntime, NumerologieComportementSocial, NumerologieIntellect, NumerologieMotCle, NumerologieNoeudEmotionnel, NumerologiePersonaliteExterieure, NumerologiePersonaliteProfonde};
+use crate::api::{LameMajeureDetail, NumerologieCaractereIntime, NumerologieCaractereSocial, NumerologieComportementIntime, NumerologieComportementSocial, NumerologieIntellect, NumerologieMotCle, NumerologieNoeudEmotionnel, NumerologiePersonaliteExterieure, NumerologiePersonaliteProfonde, NumerologieRechercheHarmonie};
 use crate::core_docx::{ColorEnum, NumerologieAspects};
 use crate::html_tools::extract_supers_and_bold_and_italic;
 use strum::IntoEnumIterator;
@@ -53,6 +53,11 @@ pub struct ThemeNumerologie {
     pub ppr_carte: Vec<u8>,
     pub ppr_html: HtmlNBR,
     pub ppr_aspects: Vec<NumerologieAspects>,
+    pub rha_lame: Option<LameMajeureDetail>,
+    pub rha_mots_cles: Vec<(ColorEnum, String)>,
+    pub rha_carte: Vec<u8>,
+    pub rha_html: HtmlNBR,
+    pub rha_aspects: Vec<NumerologieAspects>,
 }
 
 #[derive(Clone, Debug, EnumIter)]
@@ -65,6 +70,7 @@ pub enum TraitementNumerologie {
     Nem,
     Pex,
     Ppr,
+    Rha,
 }
 
 #[derive(Clone, Debug)]
@@ -157,6 +163,15 @@ impl ThemeNumerologie {
                 html_r: "".to_string(),
             },
             ppr_aspects: vec![],
+            rha_lame: None,
+            rha_mots_cles: vec![],
+            rha_carte: vec![],
+            rha_html: HtmlNBR {
+                html: "".to_string(),
+                html_b: "".to_string(),
+                html_r: "".to_string(),
+            },
+            rha_aspects: vec![],
         }
     }
 
@@ -214,6 +229,9 @@ impl ThemeNumerologie {
                 TraitementNumerologie::Ppr => {
                     self.numerologie.interpretation_ppr
                 }
+                TraitementNumerologie::Rha => {
+                    self.numerologie.interpretation_rha
+                }
             };
             let url = format!("{}/api/lame_majeures/{}", self.base_url, carte);
             let client = Client::new();
@@ -249,6 +267,9 @@ impl ThemeNumerologie {
                 TraitementNumerologie::Ppr => {
                     self.ppr_lame = Some(resp.json().await?);
                 }
+                TraitementNumerologie::Rha => {
+                    self.rha_lame = Some(resp.json().await?);
+                }
             }
         }
         self.compute_html_and_aspect_data();
@@ -278,6 +299,7 @@ impl ThemeNumerologie {
         let mut nem: Option<NumerologieNoeudEmotionnel> = None;
         let mut pex: Option<NumerologiePersonaliteExterieure> = None;
         let mut ppr: Option<NumerologiePersonaliteProfonde> = None;
+        let mut rha: Option<NumerologieRechercheHarmonie> = None;
         TraitementNumerologie::iter().for_each(|x| {
             let mut html: String = "".to_string();
             let mut html_b: String = "".to_string();
@@ -399,6 +421,22 @@ impl ThemeNumerologie {
                         .map(|c| c.html_body_one_note_raw_b.clone())
                         .unwrap_or_else(|| "".to_string());
                     html_r = ppr
+                        .as_ref() // convertit Option<T> en Option<&T>
+                        .map(|c| c.html_body_one_note_raw_r.clone())
+                        .unwrap_or_else(|| "".to_string());
+                }
+                TraitementNumerologie::Rha => {
+                    rha = self.rha_lame.clone().unwrap().numerologie_recherche_harmonie.clone();
+                    lame_majeure_detail = self.rha_lame.clone();
+                    html = rha
+                        .as_ref() // convertit Option<T> en Option<&T>
+                        .map(|c| c.html_body_one_note_raw.clone())
+                        .unwrap_or_else(|| "".to_string());
+                    html_b = rha
+                        .as_ref() // convertit Option<T> en Option<&T>
+                        .map(|c| c.html_body_one_note_raw_b.clone())
+                        .unwrap_or_else(|| "".to_string());
+                    html_r = rha
                         .as_ref() // convertit Option<T> en Option<&T>
                         .map(|c| c.html_body_one_note_raw_r.clone())
                         .unwrap_or_else(|| "".to_string());
@@ -549,6 +587,19 @@ impl ThemeNumerologie {
                     self.ppr_carte = self.get_carte(self.ppr_lame.as_ref().unwrap().id).unwrap(); // TODO intercepté le error IO
                     self.ppr_html = html_struct;
                     self.ppr_aspects = traitement_aspects;
+                }
+                TraitementNumerologie::Rha => {
+                    let (mots_cles, html_struct) = traiter_lame(
+                        &self.ppr_lame,
+                        |id| self.get_carte(id),
+                        html,
+                        html_b,
+                        html_r,
+                    );
+                    self.rha_mots_cles = mots_cles;
+                    self.rha_carte = self.get_carte(self.rha_lame.as_ref().unwrap().id).unwrap(); // TODO intercepté le error IO
+                    self.rha_html = html_struct;
+                    self.rha_aspects = traitement_aspects;
                 }
             }
         });

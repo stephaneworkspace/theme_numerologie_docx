@@ -134,6 +134,7 @@ pub extern "C" fn selection_traitment(password: *const libc::c_char, type_traite
             6 => TraitementNumerologie::Int,
             7 => TraitementNumerologie::Nem,
             8 => TraitementNumerologie::Pex,
+            9 => TraitementNumerologie::Rha,
             _ => {
                 TraitementNumerologie::Ppr
             }

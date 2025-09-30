@@ -136,6 +136,15 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                 html_r: "".to_string(),
             },
             ppr_aspects: vec![],
+            rha_lame: None,
+            rha_mots_cles: vec![],
+            rha_carte: vec![],
+            rha_html: HtmlNBR {
+                html: "".to_string(),
+                html_b: "".to_string(),
+                html_r: "".to_string(),
+            },
+            rha_aspects: vec![],
         }
     }
     async fn selection_traitement_json(&self, traitement: TraitementNumerologie, carte: Option<u32>) -> Result<(String), reqwest::Error> {
@@ -166,6 +175,9 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                 }
                 TraitementNumerologie::Ppr => {
                     self.numerologie.interpretation_ppr
+                }
+                TraitementNumerologie::Rha => {
+                    self.numerologie.interpretation_rha
                 }
             }
         };
@@ -203,6 +215,9 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
             TraitementNumerologie::Ppr => {
                 Some(resp.json().await?)
             }
+            TraitementNumerologie::Rha => {
+                Some(resp.json().await?)
+            }
         };
         let l = &lame.unwrap();
         let lt = &l.numerologie_caractere_intime;
@@ -215,7 +230,8 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
             | TraitementNumerologie::Coe
             | TraitementNumerologie::Nem
             | TraitementNumerologie::Pex
-            | TraitementNumerologie::Ppr => {
+            | TraitementNumerologie::Ppr
+            | TraitementNumerologie::Rha => {
                 (lt.as_ref().unwrap().html_body_one_note_raw.clone(),
                  lt.as_ref().unwrap().html_body_one_note_raw_b.clone(),
                  lt.as_ref().unwrap().html_body_one_note_raw_r.clone())
