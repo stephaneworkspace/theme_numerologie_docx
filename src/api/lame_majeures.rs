@@ -133,7 +133,7 @@ pub struct DivinationAssociationsClassiquesSmN1 {
 }
 
 #[derive(Debug, Deserialize, Clone)]
-pub struct DivinationInterpretationClassiquesSmN1 {
+pub struct DivinationInterpretationTraditionnellesSmN1 {
     pub id: String,
     pub lame_majeure_id: u32,
     pub nom: String,
@@ -359,7 +359,7 @@ pub struct LameMajeureDetail {
     pub divination_associations_classiques: Vec<DivinationAssociationsClassiques>,
     pub divination_personnages: Vec<DivinationPersonnages>,
     pub divination_associations_classiques_sm_n1: Vec<DivinationAssociationsClassiquesSmN1>,
-    pub divination_interpretation_classiques_sm_n1: Vec<DivinationInterpretationClassiquesSmN1>,
+    pub divination_interpretation_traditionnelles_sm_n1: Vec<DivinationInterpretationTraditionnellesSmN1>,
     pub divination_verbes_sm_n1: Vec<DivinationVerbesSmN1>,
     pub lame_majeures_numerologie: Option<LameMajeuresNumerologie>,
     pub numerologie_aspects: Vec<NumerologieAspect>,
