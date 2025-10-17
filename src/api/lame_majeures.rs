@@ -93,6 +93,7 @@ pub struct LameMajeuresDivinationDetail {
     pub evenement_negatif_l6: Option<String>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    pub commentaire: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
