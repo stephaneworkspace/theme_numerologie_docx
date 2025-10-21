@@ -11,7 +11,7 @@ use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
 use serde::de::Unexpected::Map;
 use strum_macros::EnumIter;
-use crate::api::{LameMajeureDetail, Numerologie, NumerologieMotCle, ThemeNumerologie, TraitementNumerologie};
+use crate::api::{LameMajeureDetail, Numerologie, NumerologieCaractereIntime, NumerologieCaractereSocial, NumerologieComportementIntime, NumerologieComportementSocial, NumerologieIntellect, NumerologieMotCle, NumerologieNoeudEmotionnel, NumerologiePersonaliteExterieure, NumerologiePersonaliteProfonde, NumerologieRechercheHarmonie, ThemeNumerologie, TraitementNumerologie};
 use crate::api::numerologie::HtmlNBR;
 use crate::core_docx::{ColorEnum, NumerologieAspects};
 use crate::html_tools::extract_supers_and_bold_and_italic;
@@ -233,47 +233,133 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
         let la = &l.numerologie_aspects;
         let (html_lame, html_lame_b, html_lame_r) = match &traitement {
             TraitementNumerologie::Cai => {
-                (lt_cai.as_ref().unwrap().html_body_one_note_raw.clone(),
-                 lt_cai.as_ref().unwrap().html_body_one_note_raw_b.clone(),
-                 lt_cai.as_ref().unwrap().html_body_one_note_raw_r.clone())
+                let z = lt_cai.clone().unwrap_or_else(|| NumerologieCaractereIntime {
+                    id: "".to_string(),
+                    lame_majeure_id: 0,
+                    html_body_one_note_raw: "".to_string(),
+                    html_body_one_note_raw_r: "".to_string(),
+                    html_body_one_note_raw_b: "".to_string(),
+                    html_body_one_note_raw_intuition: "".to_string(), // TODO
+                    html_body_one_note_raw_intuition_metaphore: "".to_string(),
+                    nombre_ami: "".to_string(),
+                    created_at: Default::default(),
+                    updated_at: Default::default(),
+                });
+                (z.html_body_one_note_raw.clone(),
+                 z.html_body_one_note_raw_b.clone(),
+                 z.html_body_one_note_raw_r.clone())
             }
             TraitementNumerologie::Cae => {
-                (lt_cae.as_ref().unwrap().html_body_one_note_raw.clone(),
-                 lt_cae.as_ref().unwrap().html_body_one_note_raw_b.clone(),
-                 lt_cae.as_ref().unwrap().html_body_one_note_raw_r.clone())
+                let z = lt_cae.clone().unwrap_or_else(|| NumerologieCaractereSocial {
+                    id: "".to_string(),
+                    lame_majeure_id: 0,
+                    html_body_one_note_raw: "".to_string(),
+                    html_body_one_note_raw_r: "".to_string(),
+                    html_body_one_note_raw_b: "".to_string(),
+                    created_at: Default::default(),
+                    updated_at: Default::default(),
+                });
+                (z.html_body_one_note_raw.clone(),
+                 z.html_body_one_note_raw_b.clone(),
+                 z.html_body_one_note_raw_r.clone())
             }
             TraitementNumerologie::Coi => {
-                (lt_coi.as_ref().unwrap().html_body_one_note_raw.clone(),
-                 lt_coi.as_ref().unwrap().html_body_one_note_raw_b.clone(),
-                 lt_coi.as_ref().unwrap().html_body_one_note_raw_r.clone())
+                let z = lt_coi.clone().unwrap_or_else(|| NumerologieComportementIntime {
+                    id: "".to_string(),
+                    lame_majeure_id: 0,
+                    html_body_one_note_raw: "".to_string(),
+                    html_body_one_note_raw_r: "".to_string(),
+                    html_body_one_note_raw_b: "".to_string(),
+                    created_at: Default::default(),
+                    updated_at: Default::default(),
+                });
+                (z.html_body_one_note_raw.clone(),
+                 z.html_body_one_note_raw_b.clone(),
+                 z.html_body_one_note_raw_r.clone())
             }
             TraitementNumerologie::Coe => {
-                (lt_coe.as_ref().unwrap().html_body_one_note_raw.clone(),
-                 lt_coe.as_ref().unwrap().html_body_one_note_raw_b.clone(),
-                 lt_coe.as_ref().unwrap().html_body_one_note_raw_r.clone())
+                let z = lt_coe.clone().unwrap_or_else(|| NumerologieComportementSocial {
+                    id: "".to_string(),
+                    lame_majeure_id: 0,
+                    html_body_one_note_raw: "".to_string(),
+                    html_body_one_note_raw_r: "".to_string(),
+                    html_body_one_note_raw_b: "".to_string(),
+                    created_at: Default::default(),
+                    updated_at: Default::default(),
+                });
+                (z.html_body_one_note_raw.clone(),
+                 z.html_body_one_note_raw_b.clone(),
+                 z.html_body_one_note_raw_r.clone())
             }
             TraitementNumerologie::Nem => {
-                (lt_nem.as_ref().unwrap().html_body_one_note_raw.clone(),
-                 lt_nem.as_ref().unwrap().html_body_one_note_raw_b.clone(),
-                 lt_nem.as_ref().unwrap().html_body_one_note_raw_r.clone())
+                let z = lt_nem.clone().unwrap_or_else(|| NumerologieNoeudEmotionnel {
+                    id: "".to_string(),
+                    lame_majeure_id: 0,
+                    html_body_one_note_raw: "".to_string(),
+                    html_body_one_note_raw_r: "".to_string(),
+                    html_body_one_note_raw_b: "".to_string(),
+                    created_at: Default::default(),
+                    updated_at: Default::default(),
+                });
+                (z.html_body_one_note_raw.clone(),
+                 z.html_body_one_note_raw_b.clone(),
+                 z.html_body_one_note_raw_r.clone())
             }
             TraitementNumerologie::Pex => {
-                (lt_pex.as_ref().unwrap().html_body_one_note_raw.clone(),
-                 lt_pex.as_ref().unwrap().html_body_one_note_raw_b.clone(),
-                 lt_pex.as_ref().unwrap().html_body_one_note_raw_r.clone())
+                let z = lt_pex.clone().unwrap_or_else(|| NumerologiePersonaliteExterieure {
+                    id: "".to_string(),
+                    lame_majeure_id: 0,
+                    html_body_one_note_raw: "".to_string(),
+                    html_body_one_note_raw_r: "".to_string(),
+                    html_body_one_note_raw_b: "".to_string(),
+                    created_at: Default::default(),
+                    updated_at: Default::default(),
+                });
+                (z.html_body_one_note_raw.clone(),
+                 z.html_body_one_note_raw_b.clone(),
+                 z.html_body_one_note_raw_r.clone())
             }
             TraitementNumerologie::Ppr => {
-                (lt_ppr.as_ref().unwrap().html_body_one_note_raw.clone(),
-                 lt_ppr.as_ref().unwrap().html_body_one_note_raw_b.clone(),
-                 lt_ppr.as_ref().unwrap().html_body_one_note_raw_r.clone())
+                let z = lt_ppr.clone().unwrap_or_else(|| NumerologiePersonaliteProfonde {
+                    id: "".to_string(),
+                    lame_majeure_id: 0,
+                    html_body_one_note_raw: "".to_string(),
+                    html_body_one_note_raw_r: "".to_string(),
+                    html_body_one_note_raw_b: "".to_string(),
+                    created_at: Default::default(),
+                    updated_at: Default::default(),
+                });
+                (z.html_body_one_note_raw.clone(),
+                 z.html_body_one_note_raw_b.clone(),
+                 z.html_body_one_note_raw_r.clone())
             }
             TraitementNumerologie::Rha => {
-                (lt_rha.as_ref().unwrap().html_body_one_note_raw.clone(),
-                 lt_rha.as_ref().unwrap().html_body_one_note_raw_b.clone(),
-                 lt_rha.as_ref().unwrap().html_body_one_note_raw_r.clone())
-            },
+                let z = lt_rha.clone().unwrap_or_else(|| NumerologieRechercheHarmonie {
+                    id: "".to_string(),
+                    lame_majeure_id: 0,
+                    html_body_one_note_raw: "".to_string(),
+                    html_body_one_note_raw_r: "".to_string(),
+                    html_body_one_note_raw_b: "".to_string(),
+                    created_at: Default::default(),
+                    updated_at: Default::default(),
+                });
+                (z.html_body_one_note_raw.clone(),
+                 z.html_body_one_note_raw_b.clone(),
+                 "".to_string())
+            }
             TraitementNumerologie::Int => {
-                (lt_int.as_ref().unwrap().html_body_one_note_raw.clone(),
+                let z = lt_int.clone().unwrap_or_else(|| NumerologieIntellect {
+                    id: "".to_string(),
+                    lame_majeure_id: 0,
+                    html_body_one_note_raw: "".to_string(),
+                    html_body_one_note_raw_metaphore: "".to_string(),
+                    created_at: Default::default(),
+                    updated_at: Default::default(),
+                    mois_similaire: "".to_string(),
+                });
+                // TODO
+                let zz = z.html_body_one_note_raw.clone() + "<br>" + &*z.html_body_one_note_raw_metaphore.clone();
+                (zz,
                  "".to_string(),
                  "".to_string())
             }
