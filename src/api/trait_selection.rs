@@ -220,24 +220,60 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
             }
         };
         let l = &lame.unwrap();
-        let lt = &l.numerologie_caractere_intime;
+        let lt_cai= &l.numerologie_caractere_intime;
+        let lt_cae= &l.numerologie_caractere_social;
+        let lt_int= &l.numerologie_intellect;
+        let lt_coi= &l.numerologie_comportement_intime;
+        let lt_coe= &l.numerologie_comportement_social;
+        let lt_nem= &l.numerologie_noeud_emotionnel;
+        let lt_ppr= &l.numerologie_personalite_profonde;
+        let lt_pex= &l.numerologie_personalite_exterieure;
+        let lt_rha= &l.numerologie_recherche_harmonie;
         let lv = &l.numerologie_vocabulaire_divers;
         let la = &l.numerologie_aspects;
         let (html_lame, html_lame_b, html_lame_r) = match &traitement {
-            TraitementNumerologie::Cai
-            | TraitementNumerologie::Cae
-            | TraitementNumerologie::Coi
-            | TraitementNumerologie::Coe
-            | TraitementNumerologie::Nem
-            | TraitementNumerologie::Pex
-            | TraitementNumerologie::Ppr
-            | TraitementNumerologie::Rha => {
-                (lt.as_ref().unwrap().html_body_one_note_raw.clone(),
-                 lt.as_ref().unwrap().html_body_one_note_raw_b.clone(),
-                 lt.as_ref().unwrap().html_body_one_note_raw_r.clone())
+            TraitementNumerologie::Cai => {
+                (lt_cai.as_ref().unwrap().html_body_one_note_raw.clone(),
+                 lt_cai.as_ref().unwrap().html_body_one_note_raw_b.clone(),
+                 lt_cai.as_ref().unwrap().html_body_one_note_raw_r.clone())
+            }
+            TraitementNumerologie::Cae => {
+                (lt_cae.as_ref().unwrap().html_body_one_note_raw.clone(),
+                 lt_cae.as_ref().unwrap().html_body_one_note_raw_b.clone(),
+                 lt_cae.as_ref().unwrap().html_body_one_note_raw_r.clone())
+            }
+            TraitementNumerologie::Coi => {
+                (lt_coi.as_ref().unwrap().html_body_one_note_raw.clone(),
+                 lt_coi.as_ref().unwrap().html_body_one_note_raw_b.clone(),
+                 lt_coi.as_ref().unwrap().html_body_one_note_raw_r.clone())
+            }
+            TraitementNumerologie::Coe => {
+                (lt_coe.as_ref().unwrap().html_body_one_note_raw.clone(),
+                 lt_coe.as_ref().unwrap().html_body_one_note_raw_b.clone(),
+                 lt_coe.as_ref().unwrap().html_body_one_note_raw_r.clone())
+            }
+            TraitementNumerologie::Nem => {
+                (lt_nem.as_ref().unwrap().html_body_one_note_raw.clone(),
+                 lt_nem.as_ref().unwrap().html_body_one_note_raw_b.clone(),
+                 lt_nem.as_ref().unwrap().html_body_one_note_raw_r.clone())
+            }
+            TraitementNumerologie::Pex => {
+                (lt_pex.as_ref().unwrap().html_body_one_note_raw.clone(),
+                 lt_pex.as_ref().unwrap().html_body_one_note_raw_b.clone(),
+                 lt_pex.as_ref().unwrap().html_body_one_note_raw_r.clone())
+            }
+            TraitementNumerologie::Ppr => {
+                (lt_ppr.as_ref().unwrap().html_body_one_note_raw.clone(),
+                 lt_ppr.as_ref().unwrap().html_body_one_note_raw_b.clone(),
+                 lt_ppr.as_ref().unwrap().html_body_one_note_raw_r.clone())
+            }
+            TraitementNumerologie::Rha => {
+                (lt_rha.as_ref().unwrap().html_body_one_note_raw.clone(),
+                 lt_rha.as_ref().unwrap().html_body_one_note_raw_b.clone(),
+                 lt_rha.as_ref().unwrap().html_body_one_note_raw_r.clone())
             },
             TraitementNumerologie::Int => {
-                (lt.as_ref().unwrap().html_body_one_note_raw.clone(),
+                (lt_int.as_ref().unwrap().html_body_one_note_raw.clone(),
                  "".to_string(),
                  "".to_string())
             }
