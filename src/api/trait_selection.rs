@@ -231,7 +231,7 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
         let lt_rha= &l.numerologie_recherche_harmonie;
         let lv = &l.numerologie_vocabulaire_divers;
         let la = &l.numerologie_aspects;
-        let (html_lame, html_lame_b, html_lame_r) = match &traitement {
+        let (html_lame, html_lame_b, html_lame_r, html_aux1, html_aux2) = match &traitement {
             TraitementNumerologie::Cai => {
                 let z = lt_cai.clone().unwrap_or_else(|| NumerologieCaractereIntime {
                     id: "".to_string(),
@@ -247,7 +247,9 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                 });
                 (z.html_body_one_note_raw.clone(),
                  z.html_body_one_note_raw_b.clone(),
-                 z.html_body_one_note_raw_r.clone())
+                 z.html_body_one_note_raw_r.clone(),
+                 z.html_body_one_note_raw_intuition.clone(),
+                 z.html_body_one_note_raw_intuition_metaphore.clone())
             }
             TraitementNumerologie::Cae => {
                 let z = lt_cae.clone().unwrap_or_else(|| NumerologieCaractereSocial {
@@ -261,7 +263,9 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                 });
                 (z.html_body_one_note_raw.clone(),
                  z.html_body_one_note_raw_b.clone(),
-                 z.html_body_one_note_raw_r.clone())
+                 z.html_body_one_note_raw_r.clone(),
+                 "".to_string(),
+                 "".to_string())
             }
             TraitementNumerologie::Coi => {
                 let z = lt_coi.clone().unwrap_or_else(|| NumerologieComportementIntime {
@@ -275,7 +279,9 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                 });
                 (z.html_body_one_note_raw.clone(),
                  z.html_body_one_note_raw_b.clone(),
-                 z.html_body_one_note_raw_r.clone())
+                 z.html_body_one_note_raw_r.clone(),
+                "".to_string(),
+                "".to_string())
             }
             TraitementNumerologie::Coe => {
                 let z = lt_coe.clone().unwrap_or_else(|| NumerologieComportementSocial {
@@ -289,7 +295,9 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                 });
                 (z.html_body_one_note_raw.clone(),
                  z.html_body_one_note_raw_b.clone(),
-                 z.html_body_one_note_raw_r.clone())
+                 z.html_body_one_note_raw_r.clone(),
+                 "".to_string(),
+                 "".to_string())
             }
             TraitementNumerologie::Nem => {
                 let z = lt_nem.clone().unwrap_or_else(|| NumerologieNoeudEmotionnel {
@@ -303,7 +311,9 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                 });
                 (z.html_body_one_note_raw.clone(),
                  z.html_body_one_note_raw_b.clone(),
-                 z.html_body_one_note_raw_r.clone())
+                 z.html_body_one_note_raw_r.clone(),
+                 "".to_string(),
+                 "".to_string())
             }
             TraitementNumerologie::Pex => {
                 let z = lt_pex.clone().unwrap_or_else(|| NumerologiePersonaliteExterieure {
@@ -317,7 +327,9 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                 });
                 (z.html_body_one_note_raw.clone(),
                  z.html_body_one_note_raw_b.clone(),
-                 z.html_body_one_note_raw_r.clone())
+                 z.html_body_one_note_raw_r.clone(),
+                 "".to_string(),
+                 "".to_string())
             }
             TraitementNumerologie::Ppr => {
                 let z = lt_ppr.clone().unwrap_or_else(|| NumerologiePersonaliteProfonde {
@@ -331,7 +343,9 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                 });
                 (z.html_body_one_note_raw.clone(),
                  z.html_body_one_note_raw_b.clone(),
-                 z.html_body_one_note_raw_r.clone())
+                 z.html_body_one_note_raw_r.clone(),
+                 "".to_string(),
+                 "".to_string())
             }
             TraitementNumerologie::Rha => {
                 let z = lt_rha.clone().unwrap_or_else(|| NumerologieRechercheHarmonie {
@@ -345,7 +359,9 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                 });
                 (z.html_body_one_note_raw.clone(),
                  z.html_body_one_note_raw_b.clone(),
-                 "".to_string())
+                 "".to_string(),
+                "".to_string(),
+                "".to_string())
             }
             TraitementNumerologie::Int => {
                 let z = lt_int.clone().unwrap_or_else(|| NumerologieIntellect {
@@ -357,16 +373,19 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                     updated_at: Default::default(),
                     mois_similaire: "".to_string(),
                 });
-                // TODO
                 let zz = z.html_body_one_note_raw.clone() + "<br>" + &*z.html_body_one_note_raw_metaphore.clone();
                 (zz,
                  "".to_string(),
-                 "".to_string())
+                 "".to_string(),
+                 "".to_string(),
+                 z.html_body_one_note_raw_metaphore.clone())
             }
         };
         let res = extract_supers_and_bold_and_italic(html_lame.as_str(), false);
         let res_b = extract_supers_and_bold_and_italic(html_lame_b.as_str(), false);
         let res_r = extract_supers_and_bold_and_italic(html_lame_r.as_str(), false);
+        let res_aux1 = extract_supers_and_bold_and_italic(html_aux1.as_str(), false);
+        let res_aux2 = extract_supers_and_bold_and_italic(html_aux2.as_str(), false);
         let mut bold_aspects: Vec<String> = vec![];
         bold_aspects = l.clone().numerologie_aspects.as_slice()
             .iter()
@@ -478,6 +497,8 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                 html: res.0,
                 html_b: if res_b.0 == "" { None } else { Some(res_b.0) },
                 html_r: if res_r.0 == "" { None } else { Some(res_r.0) },
+                html_aux1: if res_aux1.0 == "" { None } else { Some(res_aux1.0) },
+                html_aux2: if res_aux2.0 == "" { None } else { Some(res_aux2.0) },
                 aspects_cles,
             },
             vocabulaire_divers,
@@ -676,6 +697,8 @@ pub struct SelectionTraitment {
     html: String,
     html_b: Option<String>,
     html_r: Option<String>,
+    html_aux1: Option<String>,
+    html_aux2: Option<String>,
     aspects_cles: Vec<String>,
 }
 #[derive(Clone, Debug, Serialize)]
