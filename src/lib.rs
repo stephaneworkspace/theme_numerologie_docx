@@ -10,7 +10,7 @@ pub mod prepare_selection;
 // mod tools;
 use docx_rs::*;
 pub use crate::api::{MultiAuth, TNumerologieClient};
-use std::ffi::CString;
+use std::ffi::{CStr, CString};
 use std::io::{Cursor, Read};
 use base64::engine::general_purpose;
 use base64::Engine as _;
@@ -169,4 +169,31 @@ pub extern "C" fn free_cstring(ptr: *mut libc::c_char) {
         // Reprend la propriété de la mémoire et la libère automatiquement
         let _ = CString::from_raw(ptr);
     }
+}
+
+#[no_mangle]
+pub extern "C" fn cyclesPng(j: libc::c_int,
+                            m: libc::c_int,
+                            a: libc::c_int,
+                            age: libc::c_int,
+                            path_cycle: *const libc::c_char, ) -> *const libc::c_char {
+    let c_str = unsafe { CStr::from_ptr(path_cycle) };
+    let path_cycle_str = match c_str.to_str() {
+        Ok(s) => s,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    let result = cycles_numerologie_du_tarot::generate(j as usize, m as usize, a as usize, age as usize, path_cycle_str.to_string());
+    let json_cstring = match result {
+        Ok(png_bytes) => {
+            let b64 = general_purpose::STANDARD.encode(&png_bytes);
+            let json = format!("{{\"png\":\"{}\"}}", b64);
+            CString::new(json).unwrap()
+        },
+        Err(msg) => {
+            eprintln!("Erreur durant l'exécution cyclesPng : {}", msg);
+            CString::new(format!("{{\"error\":\"{}\"}}", msg)).unwrap()
+        }
+    };
+
+    json_cstring.into_raw()
 }

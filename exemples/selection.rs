@@ -20,7 +20,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Token N: {:?}", token_n);
     println!("Token T: {:?}", token_t);
-    let traitement: TraitementNumerologie = TraitementNumerologie::Coi;
+    let traitement: TraitementNumerologie = TraitementNumerologie::Rha;
     let json = prepare_selection(token_n, token_t, id, traitement, Some(7)).await?;
     println!("{}", json.clone());
     Ok(())
