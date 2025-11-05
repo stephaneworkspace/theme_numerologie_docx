@@ -338,6 +338,18 @@ pub struct NumerologieVocabulaireDivers {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct NumerologieCycles {
+    pub id: String,
+    pub lame_majeure_id: Option<u32>,
+    pub cycle: Option<String>,
+    pub cycle_r: Option<String>,
+    pub coaching: Option<String>,
+    pub coaching_r: Option<String>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
 #[derive(Debug, Deserialize, Clone)]
 pub struct LameMajeureSummary {
     pub id: u32,
@@ -377,4 +389,5 @@ pub struct LameMajeureDetail {
     pub numerologie_comportement_social: Option<NumerologieComportementSocial>,
     pub numerologie_personalite_exterieure: Option<NumerologiePersonaliteExterieure>,
     pub numerologie_vocabulaire_divers: Vec<NumerologieVocabulaireDivers>,
+    pub numerologie_cycles: Option<NumerologieCycles>,
 }
