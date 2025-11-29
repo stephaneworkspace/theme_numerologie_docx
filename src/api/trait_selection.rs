@@ -40,7 +40,7 @@ pub trait TraitSelectionNumerologie {
 impl TraitSelectionNumerologie for TNumerologieClient {
     fn new_sans_cartes(token_n: String, token_t: String) -> Self {
         Self {
-            base_url: "https://t.bressani.dev:1178".to_string(),
+            base_url: "https://divination.bressani.dev/api/".to_string(),
             path_cartes: "".to_string(),
             token_n,
             token_t,
@@ -48,7 +48,7 @@ impl TraitSelectionNumerologie for TNumerologieClient {
     }
 
     async fn get_index_sans_cartes(&self, id: u32) -> Result<ThemeNumerologie, reqwest::Error> {
-        let url = format!("{}/api/numerologie/{}", self.base_url, id);
+        let url = format!("{}numerologie/{}", self.base_url, id);
         let client = Client::new();
         let resp: Response = client
             .get(&url)
@@ -65,7 +65,7 @@ impl TraitSelectionNumerologie for TNumerologieClient {
 impl TraitSelectionThemeNumerologie for ThemeNumerologie {
     fn new_sans_cartes(numerologie: Numerologie, token: String) -> Self {
         Self {
-            base_url: "https://numerologie.bressani.dev:1122".to_string(),
+            base_url: "https://numerologie.bressani.dev:1122/api/".to_string(),
             numerologie,
             token,
             path_cartes: "".to_string(),
@@ -181,7 +181,7 @@ impl TraitSelectionThemeNumerologie for ThemeNumerologie {
                 }
             }
         };
-        let url = format!("{}/api/lame_majeures/{}", self.base_url, carte);
+        let url = format!("{}lame_majeures/{}", self.base_url, carte);
         let client = Client::new();
         let resp: Response =
             client

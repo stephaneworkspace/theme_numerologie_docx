@@ -5,10 +5,10 @@ pub struct Const;
 
 impl Const {
     pub fn api() -> &'static str {
-        "https://numerologie.bressani.dev:1122"
+        "https://numerologie.bressani.dev:1122/api/"
     }
     pub fn api_t() -> &'static str {
-        "https://t.bressani.dev:1178"
+        "https://divination.bressani.dev/api/"
     }
 }
 
@@ -26,7 +26,7 @@ impl MultiAuth {
     pub async fn new(password: String) -> Self {
         let url_n = Const::api().to_string();
         let token_n = Self::fetch_token(&url_n, password.as_str().to_string());
-        let url_t = format!("{}/public", Const::api_t());
+        let url_t = Const::api_t().to_string();
         let token_t = Self::fetch_token(&url_t, password.as_str().to_string());
         MultiAuth {
             token_n: token_n.await,
@@ -36,7 +36,7 @@ impl MultiAuth {
 
     async fn fetch_token(base_url: &String, password: String) -> Option<String> {
         let client = Client::new();
-        let url = format!("{}/token_rust?password={}", base_url, password);
+        let url = format!("{}token_rust?password={}", base_url, password);
 
         let resp: Option<Response> = client
             .post(&url)

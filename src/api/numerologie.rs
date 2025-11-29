@@ -92,7 +92,7 @@ struct ComposeAspect {
 impl ThemeNumerologie {
     pub fn new(numerologie: Numerologie, token: String, path_cartes: String) -> Self {
         Self {
-            base_url: "https://numerologie.bressani.dev:1122".to_string(),
+            base_url: "https://numerologie.bressani.dev:1122/api/".to_string(),
             numerologie,
             token,
             path_cartes,
@@ -176,7 +176,7 @@ impl ThemeNumerologie {
     }
 
     /*pub async fn get_cai(&mut self, carte: u32) -> Result<(i32, LameMajeureDetail), reqwest::Error> {
-        let url = format!("{}/api/lame_majeures/{}", self.base_url, carte);
+        let url = format!("{}lame_majeures/{}", self.base_url, carte);
         let client = Client::new();
         let resp: Response =
             client
@@ -233,7 +233,7 @@ impl ThemeNumerologie {
                     self.numerologie.interpretation_rha
                 }
             };
-            let url = format!("{}/api/lame_majeures/{}", self.base_url, carte);
+            let url = format!("{}lame_majeures/{}", self.base_url, carte);
             let client = Client::new();
             let resp: Response =
                 client
@@ -683,14 +683,14 @@ pub struct TNumerologieClient {
 impl TNumerologieClient {
     pub fn new(token_n: String, token_t: String, path_cartes: String) -> Self {
         Self {
-            base_url: "https://t.bressani.dev:1178".to_string(),
+            base_url: "https://divination.bressani.dev/api/".to_string(),
             path_cartes,
             token_n,
             token_t,
         }
     }
     pub async fn get_index(&self, id: u32) -> Result<ThemeNumerologie, reqwest::Error> {
-        let url = format!("{}/api/numerologie/{}", self.base_url, id);
+        let url = format!("{}numerologie/{}", self.base_url, id);
         let client = Client::new();
         let resp: Response = client
             .get(&url)
