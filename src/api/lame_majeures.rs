@@ -357,6 +357,8 @@ pub struct LameMajeureSummary {
     pub nombre_romain: String,
     pub nom: Option<String>,
     pub cartouche_grimaud: Option<String>,
+    pub note: Option<String>,
+    pub binaire: Option<String>
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -366,6 +368,8 @@ pub struct LameMajeureDetail {
     pub nombre_romain: String,
     pub nom: Option<String>,
     pub cartouche_grimaud: Option<String>,
+    pub note: Option<String>,
+    pub binaire: Option<String>,
     pub lame_majeures_divination: Option<LameMajeuresDivination>,
     pub lame_majeures_divination_detail: Option<LameMajeuresDivinationDetail>,
     pub lame_majeures_divination_principes: Option<LameMajeuresDivinationPrincipes>,
