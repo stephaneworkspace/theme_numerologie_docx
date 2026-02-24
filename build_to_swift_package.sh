@@ -1,3 +1,5 @@
+#!/bin/bash
+set -e
 PATH_DEST="$HOME/Code/macos/ref/Numerologie.Du.Tarot.De.Marseille.Bressani.Dev/Sources/Numerologie.Du.Tarot.De.Marseille.Bressani.Dev/theme_numerologie_docx_rust"
 ./build_ios_xcframework.sh
 cargo build --release --target aarch64-apple-darwin
