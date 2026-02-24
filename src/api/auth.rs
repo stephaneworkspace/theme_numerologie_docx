@@ -5,7 +5,7 @@ pub struct Const;
 
 impl Const {
     pub fn api() -> &'static str {
-        "https://numerologie.bressani.dev:1122/api/"
+        "https://tarot.bressani.dev:1122/api/"
     }
     pub fn api_t() -> &'static str {
         "https://divination.bressani.dev/api/"
