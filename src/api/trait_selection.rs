@@ -65,7 +65,7 @@ impl TraitSelectionNumerologie for TNumerologieClient {
 impl TraitSelectionThemeNumerologie for ThemeNumerologie {
     fn new_sans_cartes(numerologie: Numerologie, token: String) -> Self {
         Self {
-            base_url: "https://numerologie.bressani.dev:1122/api/".to_string(),
+            base_url: "https://tarot.bressani.dev/api/".to_string(),
             numerologie,
             token,
             path_cartes: "".to_string(),

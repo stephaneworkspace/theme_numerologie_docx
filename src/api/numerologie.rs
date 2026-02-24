@@ -92,7 +92,7 @@ struct ComposeAspect {
 impl ThemeNumerologie {
     pub fn new(numerologie: Numerologie, token: String, path_cartes: String) -> Self {
         Self {
-            base_url: "https://numerologie.bressani.dev:1122/api/".to_string(),
+            base_url: "https://tarot.bressani.dev/api/".to_string(),
             numerologie,
             token,
             path_cartes,
