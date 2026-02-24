@@ -683,7 +683,7 @@ pub struct TNumerologieClient {
 impl TNumerologieClient {
     pub fn new(token_n: String, token_t: String, path_cartes: String) -> Self {
         Self {
-            base_url: "https://divination.bressani.dev/api/".to_string(),
+            base_url: "https://esoterisme.bressani.dev/api/".to_string(),
             path_cartes,
             token_n,
             token_t,

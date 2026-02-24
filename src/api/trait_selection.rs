@@ -40,7 +40,7 @@ pub trait TraitSelectionNumerologie {
 impl TraitSelectionNumerologie for TNumerologieClient {
     fn new_sans_cartes(token_n: String, token_t: String) -> Self {
         Self {
-            base_url: "https://divination.bressani.dev/api/".to_string(),
+            base_url: "https://esoterisme.bressani.dev/api/".to_string(),
             path_cartes: "".to_string(),
             token_n,
             token_t,
